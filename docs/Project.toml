@@ -1,0 +1,9 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+ERGMUserterms = "e1f23456-7890-abcd-ef12-345678901234"
+
+[sources]
+ERGMUserterms = {path = ".."}
+
+[compat]
+Documenter = "1"
