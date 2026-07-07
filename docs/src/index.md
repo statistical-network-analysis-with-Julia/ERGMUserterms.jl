@@ -16,7 +16,7 @@ An ERGM term is a network statistic that captures a structural feature:
 
 ```text
 compute(term, net) → network statistic value
-change_stat(term, net, i, j) → change when toggling edge (i,j)
+change_stat(term, net, i, j) → add-direction change: g(y⁺ij) − g(y⁻ij)
 ```
 
 Custom terms let you model network features beyond the built-in terms in ERGM.jl, such as:
@@ -32,7 +32,7 @@ Custom terms let you model network features beyond the built-in terms in ERGM.jl
 |---------|-------------|
 | **ERGM Term** | A network statistic measuring a structural feature |
 | **compute()** | Calculates the full statistic value for a network |
-| **change_stat()** | Calculates the change when a single edge is toggled |
+| **change_stat()** | The add-direction change statistic g(y⁺ij) − g(y⁻ij), state-independent |
 | **Consistency** | `change_stat(net, i, j) == compute(net') - compute(net)` |
 | **Validation** | Automated checks that a term is correctly implemented |
 
@@ -86,7 +86,9 @@ function compute(t::MyTerm, net)
 end
 
 function change_stat(t::MyTerm, net, i::Int, j::Int)
-    return has_edge(net, i, j) ? -t.param : t.param
+    # Add-direction: statistic with edge (i,j) present minus absent,
+    # regardless of the dyad's current state
+    return t.param
 end
 
 # Create a test network and validate
@@ -137,11 +139,11 @@ Where:
 
 ### Change Statistics in MCMC
 
-ERGM estimation relies on MCMC simulation, where edges are toggled one at a time. The change statistic for toggling edge $(i,j)$ is:
+ERGM estimation relies on MCMC simulation, where edges are toggled one at a time. The change statistic for dyad $(i,j)$ is the add-direction difference
 
 $$\Delta g_k(i,j) = g_k(\mathbf{y}^{+}_{ij}) - g_k(\mathbf{y}^{-}_{ij})$$
 
-This is computed by `change_stat()` and must be consistent with `compute()` for correct estimation. ERGMUserterms.jl validates this consistency automatically.
+with $\mathbf{y}^{+}_{ij}$/$\mathbf{y}^{-}_{ij}$ the network with the edge forced present/absent. `change_stat()` must return exactly this quantity — independent of the dyad's current state (the sampler negates it for removals). ERGMUserterms.jl validates both the value and its state-independence.
 
 ## References
 

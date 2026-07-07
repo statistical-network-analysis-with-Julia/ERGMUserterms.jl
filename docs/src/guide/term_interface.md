@@ -106,24 +106,25 @@ end
 
 ### change_stat()
 
-Calculates the change in the statistic when edge `(i,j)` is toggled:
+Calculates the **add-direction** change statistic for dyad `(i,j)`:
 
 ```julia
 function change_stat(term::MyTerm, net, i::Int, j::Int)
-    # If edge exists: return compute(net_without_ij) - compute(net)
-    # If edge absent: return compute(net_with_ij) - compute(net)
+    # Return compute(net with edge i→j) - compute(net without edge i→j),
+    # holding every other dyad fixed. The value must NOT depend on whether
+    # the edge currently exists.
 end
 ```
 
 #### The Fundamental Relationship
 
 ```text
-change_stat(term, net, i, j) == compute(term, net') - compute(term, net)
+change_stat(term, net, i, j) == compute(term, net⁺ij) - compute(term, net⁻ij)
 ```
 
-Where `net'` is the network with edge `(i,j)` toggled (added if absent, removed if present).
+Where `net⁺ij`/`net⁻ij` are the network with edge `(i,j)` forced present/absent and all other dyads unchanged.
 
-This relationship **must hold exactly** for correct ERGM estimation. ERGMUserterms.jl validates this with [`change_stat_check`](@ref).
+This relationship **must hold exactly**, for both current states of the dyad, for correct ERGM estimation: the MPLE design matrix uses the value directly and the Metropolis–Hastings sampler negates it for removal proposals. ERGMUserterms.jl validates both the value and its state-independence with [`change_stat_check`](@ref).
 
 #### Requirements
 
@@ -131,22 +132,27 @@ This relationship **must hold exactly** for correct ERGM estimation. ERGMUserter
 |-------------|-------------|
 | Returns Real | Must return a `Real` (typically `Float64`) |
 | Consistent with compute | Must satisfy the fundamental relationship |
-| Handles both directions | Must work whether edge exists or not |
+| State-independent | Same value whether the edge currently exists or not |
 | Efficient | Should be O(degree), not O(edges) |
 
 #### Sign Convention
 
-The sign depends on whether the edge currently exists:
+Always return the *add-direction* value — do **not** flip the sign based on
+the dyad's current state (the estimation machinery handles removals itself):
 
 ```julia
 function change_stat(::MyTerm, net, i::Int, j::Int)
-    value = compute_local_contribution(net, i, j)
-    return has_edge(net, i, j) ? -value : value
+    # The contribution edge (i,j) makes when present. If the statistic
+    # depends on degrees or adjacency, evaluate them with the dyad's own
+    # edge masked out (the baseline state without i→j).
+    return compute_local_contribution(net, i, j)
 end
 ```
 
-- **Edge absent → being added**: Return the positive contribution
-- **Edge present → being removed**: Return the negative contribution
+!!! warning "Common bug"
+    The idiom `has_edge(net, i, j) ? -value : value` (toggle-direction) is
+    **wrong** for ERGM.jl: it double-negates removal proposals in the MH
+    sampler and sign-flips the MPLE design rows of observed edges.
 
 #### Efficiency Guidelines
 
@@ -157,9 +163,10 @@ end
 function change_stat(::TriangleTerm, net, i::Int, j::Int)
     shared = 0
     for k in outneighbors(net, i)
+        k == j && continue
         has_edge(net, j, k) && (shared += 1)
     end
-    return has_edge(net, i, j) ? -Float64(shared) : Float64(shared)
+    return Float64(shared)
 end
 
 # BAD: O(n^2) - examines all pairs

@@ -48,28 +48,32 @@ function compute(::SharedNeighborTerm, net)
     return total
 end
 
-# Method 3: change_stat - change when toggling edge (i,j)
+# Method 3: change_stat - the ADD-DIRECTION change statistic: the value of
+# the statistic with edge (i,j) present minus with it absent, regardless of
+# the dyad's current state. Neighborhoods that could contain the dyad's own
+# edge are masked (k == j skips) so the value is state-independent.
 function change_stat(::SharedNeighborTerm, net, i::Int, j::Int)
     delta = 0.0
-    sign = has_edge(net, i, j) ? -1.0 : 1.0
 
-    # Effect of (i,j) on shared neighbors of existing edges
+    # 1. The new edge (i,j)'s own shared out-neighbors
     for k in outneighbors(net, i)
-        k != j && has_edge(net, j, k) && (delta += 1.0)
-    end
-    for k in outneighbors(net, j)
-        k != i && has_edge(net, i, k) && (delta += 1.0)
+        k == j && continue
+        has_edge(net, j, k) && (delta += 1.0)
     end
 
-    # Effect on edges involving i or j
-    for k in inneighbors(net, i)
-        k != j && has_edge(net, k, j) && (delta += 1.0)
-    end
-    for k in inneighbors(net, j)
-        k != i && has_edge(net, k, i) && (delta += 1.0)
+    # 2. Existing edges (i,b) gain shared out-neighbor j when b→j
+    for b in outneighbors(net, i)
+        b == j && continue
+        has_edge(net, b, j) && (delta += 1.0)
     end
 
-    return sign * delta
+    # 3. Existing edges (a,i) gain shared out-neighbor j when a→j
+    for a in inneighbors(net, i)
+        a == j && continue
+        has_edge(net, a, j) && (delta += 1.0)
+    end
+
+    return delta
 end
 ```
 
@@ -189,11 +193,11 @@ function compute(t::WeightedDensity, net)
 end
 
 function change_stat(t::WeightedDensity, net, i::Int, j::Int)
+    # Add-direction: one extra edge adds weight/max_edges
     n = nv(net)
     max_edges = n * (n - 1)
     max_edges == 0 && return 0.0
-    delta = t.weight / max_edges
-    return has_edge(net, i, j) ? -delta : delta
+    return t.weight / max_edges
 end
 
 # === Validate ===

@@ -32,7 +32,8 @@ function compute(::ExampleTerm, net)
 end
 
 function change_stat(::ExampleTerm, net, i::Int, j::Int)
-    has_edge(net, i, j) ? -(i + j) : Float64(i + j)
+    # Add-direction: adding edge (i,j) adds i + j, whatever the current state
+    return Float64(i + j)
 end
 ```
 
@@ -72,8 +73,8 @@ function compute(::DescendingEdges, net)
 end
 
 function change_stat(::DescendingEdges, net, i::Int, j::Int)
-    i <= j && return 0.0  # This edge doesn't contribute
-    return has_edge(net, i, j) ? -1.0 : 1.0
+    # Add-direction: 1 if this edge would contribute, else 0
+    return i > j ? 1.0 : 0.0
 end
 ```
 
@@ -99,8 +100,9 @@ function compute(t::TemplateTerm, net)
 end
 
 function change_stat(t::TemplateTerm, net, i::Int, j::Int)
-    # Change is just the parameter (positive if adding, negative if removing)
-    return has_edge(net, i, j) ? -t.param : t.param
+    # Add-direction: adding edge (i,j) increases the statistic by the
+    # parameter (state-independent; removals are handled by the sampler)
+    return Float64(t.param)
 end
 ```
 
@@ -147,8 +149,7 @@ function compute(t::DecayEdges, net)
 end
 
 function change_stat(t::DecayEdges, net, i::Int, j::Int)
-    weight = t.decay ^ abs(i - j)
-    return has_edge(net, i, j) ? -weight : weight
+    return t.decay ^ abs(i - j)
 end
 ```
 
@@ -161,25 +162,33 @@ Demonstrates accessing edge attributes from the network.
 ```julia
 struct WeightedEdges <: AbstractUserTerm
     attr::Symbol
-    WeightedEdges(attr::Symbol=:weight) = new(attr)
+    default::Float64
+    WeightedEdges(attr::Symbol=:weight; default::Float64=1.0) = new(attr, default)
 end
 
 name(t::WeightedEdges) = "weightedges.$(t.attr)"
 
+# Edge attributes are keyed canonically: (i,j) directed, (min,max) undirected
+_edge_key(net, i, j) = is_directed(net) ? (i, j) : minmax(i, j)
+
 function compute(t::WeightedEdges, net)
+    # get_edge_attribute returns an (empty) Dict even when the attribute is
+    # absent, so sum over the network's edges with a default — this keeps
+    # compute consistent with change_stat when the sampler adds unweighted
+    # edges
     weights = get_edge_attribute(net, t.attr)
-    isnothing(weights) && return Float64(ne(net))
-    return Float64(sum(values(weights)))
+    total = 0.0
+    for e in edges(net)
+        total += Float64(get(weights, _edge_key(net, src(e), dst(e)), t.default))
+    end
+    return total
 end
 
 function change_stat(t::WeightedEdges, net, i::Int, j::Int)
+    # Add-direction: the weight edge (i,j) carries (stored value, else the
+    # default a fresh edge would get)
     weights = get_edge_attribute(net, t.attr)
-    current_weight = if !isnothing(weights)
-        get(weights, (i, j), 1.0)
-    else
-        1.0
-    end
-    return has_edge(net, i, j) ? -current_weight : current_weight
+    return Float64(get(weights, _edge_key(net, i, j), t.default))
 end
 ```
 
@@ -189,8 +198,8 @@ end
 net = Network{Int}(; n=5, directed=true)
 add_edge!(net, 1, 2)
 add_edge!(net, 2, 3)
-set_edge_attribute!(net, :weight, (1,2), 3.0)
-set_edge_attribute!(net, :weight, (2,3), 1.5)
+set_edge_attribute!(net, :weight, 1, 2, 3.0)
+set_edge_attribute!(net, :weight, 2, 3, 1.5)
 
 term = WeightedEdges(:weight)
 compute(term, net)  # 3.0 + 1.5 = 4.5
@@ -215,14 +224,17 @@ name(t::SquaredWeights) = "sqweights.$(t.attr)"
 
 function compute(t::SquaredWeights, net)
     weights = get_edge_attribute(net, t.attr)
-    isnothing(weights) && return Float64(ne(net))
-    return sum(v^2 for v in values(weights))
+    total = 0.0
+    for e in edges(net)
+        total += Float64(get(weights, _edge_key(net, src(e), dst(e)), 1.0))^2
+    end
+    return total
 end
 
 function change_stat(t::SquaredWeights, net, i::Int, j::Int)
     weights = get_edge_attribute(net, t.attr)
-    w = !isnothing(weights) ? get(weights, (i, j), 1.0) : 1.0
-    return has_edge(net, i, j) ? -w^2 : w^2
+    w = Float64(get(weights, _edge_key(net, i, j), 1.0))
+    return w^2
 end
 ```
 
@@ -251,9 +263,13 @@ function compute(t::DyadCovTerm, net)
 end
 
 function change_stat(t::DyadCovTerm, net, i::Int, j::Int)
+    # Undirected edges are stored canonically as (min, max); read the
+    # covariate the same way compute() sees the edge
+    if !is_directed(net)
+        i, j = minmax(i, j)
+    end
     i <= size(t.covariate, 1) && j <= size(t.covariate, 2) || return 0.0
-    val = t.covariate[i, j]
-    return has_edge(net, i, j) ? -val : val
+    return t.covariate[i, j]
 end
 ```
 
@@ -305,8 +321,7 @@ end
 
 function change_stat(t::SameGroup, net, i::Int, j::Int)
     i <= length(t.membership) && j <= length(t.membership) || return 0.0
-    t.membership[i] != t.membership[j] && return 0.0
-    return has_edge(net, i, j) ? -1.0 : 1.0
+    return t.membership[i] == t.membership[j] ? 1.0 : 0.0
 end
 ```
 
@@ -344,15 +359,14 @@ end
 function change_stat(t::InteractionTerm, net, i::Int, j::Int)
     attrs1 = get_vertex_attribute(net, t.attr1)
     attrs2 = get_vertex_attribute(net, t.attr2)
-    (isnothing(attrs1) || isnothing(attrs2)) && return 0.0
 
     v1_i = get(attrs1, i, 0.0)
     v1_j = get(attrs1, j, 0.0)
     v2_i = get(attrs2, i, 0.0)
     v2_j = get(attrs2, j, 0.0)
 
-    delta = v1_i * v2_j + v1_j * v2_i
-    return has_edge(net, i, j) ? -delta : delta
+    # Add-direction: the per-edge contribution of (i,j)
+    return v1_i * v2_j + v1_j * v2_i
 end
 ```
 
@@ -408,11 +422,9 @@ end
 function change_stat(t::DiffInteraction, net, i::Int, j::Int)
     attrs1 = get_vertex_attribute(net, t.attr1)
     attrs2 = get_vertex_attribute(net, t.attr2)
-    (isnothing(attrs1) || isnothing(attrs2)) && return 0.0
     diff1 = abs(get(attrs1, i, 0.0) - get(attrs1, j, 0.0))
     diff2 = abs(get(attrs2, i, 0.0) - get(attrs2, j, 0.0))
-    delta = diff1 * diff2
-    return has_edge(net, i, j) ? -delta : delta
+    return diff1 * diff2
 end
 ```
 

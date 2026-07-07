@@ -91,12 +91,13 @@ function change_stat(::TriangleTerm, net, i::Int, j::Int)
 end
 
 # FAST: O(d) - only counts shared neighbors of i and j
+# (add-direction: no sign flip based on the dyad's current state)
 function change_stat(::TriangleTerm, net, i::Int, j::Int)
     shared = 0
     for k in outneighbors(net, i)
         k != j && has_edge(net, j, k) && (shared += 1)
     end
-    return has_edge(net, i, j) ? -Float64(shared) : Float64(shared)
+    return Float64(shared)
 end
 ```
 
@@ -113,10 +114,8 @@ end
 # FAST: O(1) - just checks the two vertices
 function change_stat(t::NodeMatchTerm, net, i::Int, j::Int)
     attrs = get_vertex_attribute(net, t.attr)
-    isnothing(attrs) && return 0.0
     same = get(attrs, i, nothing) == get(attrs, j, nothing)
-    same || return 0.0
-    return has_edge(net, i, j) ? -1.0 : 1.0
+    return same ? 1.0 : 0.0
 end
 ```
 

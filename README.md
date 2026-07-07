@@ -42,6 +42,9 @@ using ERGM
 using ERGMUserterms
 using Network
 
+# Extend the interface generics (required so ERGM.jl sees your methods)
+import ERGMUserterms: name, compute, change_stat
+
 # Define a custom term
 struct MyTerm <: AbstractUserTerm
     param::Float64
@@ -55,8 +58,9 @@ function compute(t::MyTerm, net)
 end
 
 function change_stat(t::MyTerm, net, i::Int, j::Int)
-    # Change when toggling edge (i,j)
-    return has_edge(net, i, j) ? -t.param : t.param
+    # Add-direction change: statistic with edge (i,j) present minus with it
+    # absent. Must NOT depend on whether the edge currently exists.
+    return t.param
 end
 
 # Validate the term
@@ -121,7 +125,7 @@ result = benchmark_term(term, net; n_iter=1000)
 struct ExampleTerm <: AbstractUserTerm end
 
 compute(::ExampleTerm, net) = sum(src(e) + dst(e) for e in edges(net))
-change_stat(::ExampleTerm, net, i, j) = has_edge(net, i, j) ? -(i+j) : Float64(i+j)
+change_stat(::ExampleTerm, net, i, j) = Float64(i + j)  # add-direction, state-independent
 ```
 
 ### TemplateTerm
