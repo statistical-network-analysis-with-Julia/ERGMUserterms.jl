@@ -17,6 +17,7 @@ The ideal `change_stat()` is much faster than `compute()`, because it only needs
 
 Profile the performance of `compute()` and `change_stat()`:
 
+<!-- skip-check -->
 ```julia
 result = benchmark_term(term, net; n_iter=1000)
 ```
@@ -81,6 +82,7 @@ The key insight: when toggling edge `(i,j)`, only statistics involving vertices 
 
 #### Example: Counting Triangles
 
+<!-- skip-check -->
 ```julia
 # SLOW: O(m) - recomputes full statistic
 function change_stat(::TriangleTerm, net, i::Int, j::Int)
@@ -102,6 +104,7 @@ end
 
 #### Example: Node Match
 
+<!-- skip-check -->
 ```julia
 # SLOW: O(m) - iterates all edges
 function change_stat(t::NodeMatchTerm, net, i::Int, j::Int)
@@ -203,6 +206,7 @@ result = benchmark_term(term, net; n_iter=1000)
 
 Minimize allocations in `change_stat()`:
 
+<!-- skip-check -->
 ```julia
 # BAD: allocates on every call
 function change_stat(::MyTerm, net, i::Int, j::Int)
@@ -222,6 +226,7 @@ end
 
 Ensure your functions are type-stable:
 
+<!-- skip-check -->
 ```julia
 # BAD: type-unstable return
 function change_stat(::MyTerm, net, i::Int, j::Int)

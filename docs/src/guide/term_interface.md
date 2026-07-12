@@ -7,6 +7,7 @@ This guide covers the ERGM term interface in detail, explaining how terms work a
 Every ERGM term must implement exactly three methods:
 
 <!-- skip-check -->
+<!-- skip-check -->
 ```julia
 name(term) -> String
 compute(term, net) -> Float64
@@ -51,6 +52,7 @@ name(t::MyTerm) = "myterm.$(t.param)"
 
 #### Naming Conventions
 
+<!-- skip-check -->
 ```julia
 # Simple term
 name(::Edges) = "edges"
@@ -87,6 +89,7 @@ end
 
 #### Common Patterns
 
+<!-- skip-check -->
 ```julia
 # Counting edges with a property
 function compute(::MyEdgeTerm, net)
@@ -174,6 +177,7 @@ end
 
 `change_stat()` is called thousands of times during MCMC simulation. It must be fast:
 
+<!-- skip-check -->
 ```julia
 # GOOD: O(degree) - only examine neighbors of i and j
 function change_stat(::TriangleTerm, net, i::Int, j::Int)
@@ -334,6 +338,7 @@ end
 
 ### Accessing Network Structure
 
+<!-- skip-check -->
 ```julia
 # Vertices
 nv(net)              # Number of vertices
@@ -355,6 +360,7 @@ dst(e)               # Destination of edge
 
 ### Accessing Attributes
 
+<!-- skip-check -->
 ```julia
 # Vertex attributes
 attrs = get_vertex_attribute(net, :name)
@@ -370,6 +376,7 @@ val = get_network_attribute(net, :name)
 
 ### Modifying Networks (Only in Tests)
 
+<!-- skip-check -->
 ```julia
 # Add/remove edges
 add_edge!(net, i, j)

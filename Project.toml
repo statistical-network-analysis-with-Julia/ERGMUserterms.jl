@@ -15,10 +15,12 @@ Network = {path = "../Network.jl"}
 ERGM = {path = "../ERGM.jl"}
 
 [compat]
-julia = "1.12"
-Graphs = "1.9"
 ERGM = "0.1"
+Graphs = "1.9"
 Network = "0.1"
+Random = "1.11.0"
+Statistics = "1.11.1"
+julia = "1.12"
 
 [extras]
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"

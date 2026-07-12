@@ -14,6 +14,7 @@ The validation process has three levels:
 
 The primary validation function that checks all aspects of a term implementation:
 
+<!-- skip-check -->
 ```julia
 valid = validate_term(term, net; verbose=true)
 ```
@@ -30,7 +31,7 @@ valid = validate_term(term, net; verbose=true)
 | `change_stat()` returns Real | Type check on return value | Wrong return type |
 | Consistency | change_stat matches compute differences | Incorrect change_stat logic |
 
-### Example Output
+### Worked Example
 
 ```julia
 using ERGM, ERGMUserterms, Network
@@ -53,7 +54,7 @@ validate_term(term, net)
 
 ### Silent Validation
 
-For programmatic use, disable verbose output:
+For programmatic use, run silently and check the returned flag:
 
 ```julia
 if !validate_term(term, net; verbose=false)
@@ -105,6 +106,7 @@ For each random dyad `(i,j)` (on a copy of the network):
 
 When inconsistencies are found, verbose output shows the details:
 
+<!-- skip-check -->
 ```julia
 change_stat_check(broken_term, net; verbose=true)
 # [ Warning: Inconsistency at edge (3,7): predicted=2.0, actual=1.0

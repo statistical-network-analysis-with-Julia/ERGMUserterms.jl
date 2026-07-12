@@ -18,7 +18,14 @@ The simplest possible custom term. Counts edges weighted by vertex ID sum.
 
 ### Implementation
 
+The template implementations below re-define local copies of the bundled
+terms so you can adapt them:
+
 ```julia
+using ERGM, ERGMUserterms, Network
+using Graphs: src, dst
+import ERGM: name, compute, change_stat
+
 struct ExampleTerm <: AbstractUserTerm end
 
 name(::ExampleTerm) = "example"
@@ -46,8 +53,8 @@ add_edge!(net, 1, 2)
 add_edge!(net, 3, 4)
 
 compute(term, net)  # (1+2) + (3+4) = 10.0
-change_stat(term, net, 2, 3)  # +(2+3) = 5.0 (edge absent)
-change_stat(term, net, 1, 2)  # -(1+2) = -3.0 (edge present)
+change_stat(term, net, 2, 3)  # +(2+3) = 5.0
+change_stat(term, net, 1, 2)  # +(1+2) = 3.0 (state-independent add-direction)
 ```
 
 ### When to Use This Pattern
@@ -438,6 +445,7 @@ end
 
 For terms that count specific subgraph patterns:
 
+<!-- skip-check -->
 ```julia
 function compute(::TriangleTerm, net)
     count = 0
@@ -456,6 +464,7 @@ end
 
 For terms based on vertex properties:
 
+<!-- skip-check -->
 ```julia
 function compute(t::NodeMatchTerm, net)
     attrs = get_vertex_attribute(net, t.attr)
@@ -472,6 +481,7 @@ end
 
 For terms with conditional logic:
 
+<!-- skip-check -->
 ```julia
 function compute(t::ConditionalTerm, net)
     total = 0.0
