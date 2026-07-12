@@ -6,6 +6,7 @@ This guide covers the ERGM term interface in detail, explaining how terms work a
 
 Every ERGM term must implement exactly three methods:
 
+<!-- skip-check -->
 ```julia
 name(term) -> String
 compute(term, net) -> Float64
@@ -13,6 +14,20 @@ change_stat(term, net, i, j) -> Float64
 ```
 
 These methods form a contract that ERGM.jl relies on for correct model estimation.
+
+The examples below assume a term struct like this has been defined:
+
+```julia
+using ERGM, ERGMUserterms, Network
+import ERGMUserterms: name, compute, change_stat
+
+struct MyTerm <: AbstractUserTerm
+    param::Float64
+end
+
+t = MyTerm(2.0)
+net = network(10; directed=true)
+```
 
 ### name()
 
@@ -92,10 +107,11 @@ function compute(::MyNodeTerm, net)
     return total
 end
 
-# Using attributes
+# Using attributes. Note get_vertex_attribute returns an *empty Dict*
+# (never `nothing`) when the attribute is absent — decide explicitly what
+# missing values mean for your term (here they fall back to 0.0)
 function compute(t::MyAttrTerm, net)
     attrs = get_vertex_attribute(net, t.attr)
-    isnothing(attrs) && return 0.0
     total = 0.0
     for e in edges(net)
         total += get(attrs, src(e), 0.0) * get(attrs, dst(e), 0.0)
@@ -176,6 +192,53 @@ function change_stat(::TriangleTerm, net, i::Int, j::Int)
 end
 ```
 
+## Optional Trait: `is_dyad_dependent`
+
+ERGM.jl classifies every term as dyad-dependent or dyad-independent with
+`ERGM.is_dyad_dependent(term)`. The classification matters in two places:
+
+- **MPLE honesty caveat**: pseudo-likelihood fits containing any
+  dyad-dependent term print a standard-error warning in `show`.
+- **MCMLE log-likelihood**: the bridge-sampling reference distribution
+  zeroes the coefficients of dyad-dependent terms, so a misclassified term
+  corrupts the reported log-likelihood/AIC/BIC.
+
+For unknown term types the fallback is `true` — the conservative answer. If
+your term's change statistic depends **only** on exogenous covariates of
+dyad `(i,j)` (never on the state of other dyads), declare it:
+
+<!-- skip-check -->
+```julia
+ERGM.is_dyad_dependent(::MyCovariateTerm) = false
+```
+
+!!! warning "Subtyping `NodalTerm`/`DyadicTerm` implies dyad-independence"
+    ERGM.jl defines `is_dyad_dependent(::NodalTerm) = false` and
+    `is_dyad_dependent(::DyadicTerm) = false`. Subtype those only for
+    genuinely covariate-only terms; a term whose change statistic reads
+    other dyads (degrees, shared partners, reciprocity) must not use them
+    — keep `AbstractUserTerm` (fallback `true`) or add an explicit
+    `is_dyad_dependent` method returning `true`.
+
+## Attribute Validation Happens Only for Built-in Terms
+
+`ERGMModel` construction validates ERGM.jl's *own* attribute-based terms
+(`NodeCov`, `NodeMatch`, ...) against the network — a missing vertex
+attribute throws an `ArgumentError` before any fitting — and snapshots
+their attributes into typed vectors. User-defined terms pass through this
+machinery **unchanged**: they are neither validated nor snapshotted. That
+means:
+
+- A user term reading a misspelled attribute will *not* be caught at model
+  construction; decide explicitly how your `compute`/`change_stat` treat a
+  missing attribute (error loudly, or document a default) and cover it with
+  [`validate_term`](@ref)/[`change_stat_check`](@ref).
+- For hot loops, do the typed-snapshot optimization yourself: read
+  attributes once into a typed container in your term's constructor (or use
+  Network.jl's typed accessors `vertex_attribute_vector(net, attr, V)` /
+  `get_edge_attribute(net, attr, V)`) instead of hitting the untyped
+  attribute Dicts in every `change_stat` call.
+
 ## Type Hierarchy
 
 ```text
@@ -190,12 +253,14 @@ AbstractERGMTerm (from ERGM.jl)
 
 The base type for all user-defined terms:
 
+<!-- skip-check -->
 ```julia
 abstract type AbstractUserTerm <: AbstractERGMTerm end
 ```
 
 Your terms should subtype `AbstractUserTerm`:
 
+<!-- skip-check -->
 ```julia
 struct MyTerm <: AbstractUserTerm
     # fields
@@ -212,12 +277,15 @@ This provides:
 
 | Supertype | When to Use |
 |-----------|-------------|
-| `AbstractUserTerm` | Default choice for custom terms |
+| `AbstractUserTerm` | Default choice for custom terms (`is_dyad_dependent` falls back to `true`) |
 | `StructuralTerm` | Pure structural terms (no attributes) |
-| `NodalTerm` | Terms using vertex attributes |
-| `DyadicTerm` | Terms using edge/dyadic attributes |
+| `NodalTerm` | Covariate-only vertex-attribute terms (**implies dyad-independence**) |
+| `DyadicTerm` | Covariate-only edge/dyadic-attribute terms (**implies dyad-independence**) |
 
-For most custom terms, `AbstractUserTerm` is the right choice.
+For most custom terms, `AbstractUserTerm` is the right choice. Remember
+that `NodalTerm`/`DyadicTerm` carry the `is_dyad_dependent = false` trait
+(see above) — never use them for terms whose change statistic reads other
+dyads.
 
 ## Struct Design
 

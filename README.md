@@ -5,7 +5,7 @@
 [![Build Status](https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Documentation](https://img.shields.io/badge/docs-stable-blue.svg)](https://statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/stable/)
 [![Documentation](https://img.shields.io/badge/docs-dev-blue.svg)](https://statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/dev/)
-[![Julia](https://img.shields.io/badge/Julia-1.9+-purple.svg)](https://julialang.org/)
+[![Julia](https://img.shields.io/badge/Julia-1.12+-purple.svg)](https://julialang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center">
@@ -64,29 +64,44 @@ function change_stat(t::MyTerm, net, i::Int, j::Int)
 end
 
 # Validate the term
-net = Network{Int}(; n=20, directed=true)
-validate_term(MyTerm(2.0), net)
+net = network(20; directed=true)
+term = MyTerm(2.0)
+validate_term(term, net)
 ```
 
 ## Term Interface
 
 Every ERGM term must implement:
 
+<!-- skip-check -->
 ```julia
 # Required
 name(term) -> String           # Term name for output
 compute(term, net) -> Float64  # Network statistic
-change_stat(term, net, i, j) -> Float64  # Change when toggling (i,j)
+change_stat(term, net, i, j) -> Float64  # Add-direction change statistic
 ```
 
-The key relationship:
+The key relationship (the **add-direction** convention):
 ```
-change_stat(term, net, i, j) == compute(term, net') - compute(term, net)
+change_stat(term, net, i, j) == compute(term, net⁺ij) - compute(term, net⁻ij)
 ```
-where `net'` is `net` with edge (i,j) toggled.
+where `net⁺ij`/`net⁻ij` are `net` with edge (i,j) forced present/absent and
+all other dyads unchanged. The value must be the same whether or not the
+edge currently exists — the toggle-direction idiom
+`has_edge(net, i, j) ? -Δ : Δ` is wrong and is rejected by the validation
+harness (ERGM.jl's MH sampler negates the add-direction value itself for
+removal proposals).
+
+Optionally, covariate-only terms (change statistic never reads other dyads)
+should declare `ERGM.is_dyad_dependent(::MyTerm) = false` — the fallback for
+unknown terms is `true`, which triggers ERGM.jl's pseudo-likelihood caveat
+and a conservative MCMLE bridge reference. Note that ERGM.jl validates only
+its *built-in* attribute terms at model construction; user terms must handle
+missing attributes themselves.
 
 ## Validation
 
+<!-- skip-check -->
 ```julia
 # Full validation
 validate_term(term, net; verbose=true)
@@ -120,6 +135,7 @@ result = benchmark_term(term, net; n_iter=1000)
 ## Example Terms
 
 ### ExampleTerm
+<!-- skip-check -->
 ```julia
 # Edges weighted by vertex ID sum
 struct ExampleTerm <: AbstractUserTerm end
@@ -129,6 +145,7 @@ change_stat(::ExampleTerm, net, i, j) = Float64(i + j)  # add-direction, state-i
 ```
 
 ### TemplateTerm
+<!-- skip-check -->
 ```julia
 # Parameterized template
 struct TemplateTerm{T} <: AbstractUserTerm
@@ -140,6 +157,7 @@ end
 ```
 
 ### WeightedEdges
+<!-- skip-check -->
 ```julia
 # Sum of edge weights
 struct WeightedEdges <: AbstractUserTerm
@@ -150,6 +168,7 @@ compute(t::WeightedEdges, net) = sum(get_edge_attribute(net, t.attr))
 ```
 
 ### DyadCovTerm
+<!-- skip-check -->
 ```julia
 # Dyadic covariate
 struct DyadCovTerm <: AbstractUserTerm
@@ -160,6 +179,7 @@ compute(t::DyadCovTerm, net) = sum(t.covariate[src(e), dst(e)] for e in edges(ne
 ```
 
 ### InteractionTerm
+<!-- skip-check -->
 ```julia
 # Interaction between two node attributes
 struct InteractionTerm <: AbstractUserTerm
@@ -189,6 +209,7 @@ doc = term_documentation(term)
 ## Common Patterns
 
 ### Counting Subgraphs
+<!-- skip-check -->
 ```julia
 function compute(::TriangleTerm, net)
     count = 0
@@ -204,6 +225,7 @@ end
 ```
 
 ### Using Attributes
+<!-- skip-check -->
 ```julia
 function compute(t::NodeMatchTerm, net)
     attrs = get_vertex_attribute(net, t.attr)

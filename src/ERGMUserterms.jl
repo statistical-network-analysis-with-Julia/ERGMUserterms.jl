@@ -624,6 +624,18 @@ function change_stat(t::InteractionTerm, net, i::Int, j::Int)
     return v1_i * v2_j + v1_j * v2_i
 end
 
+# All bundled example terms are covariate-only: their change statistics
+# never read the state of other dyads. Declaring dyad-independence opts
+# them out of ERGM.jl's conservative fallback (`is_dyad_dependent = true`
+# for unknown term types), which otherwise triggers the pseudo-likelihood
+# caveat in `show` and a conservative MCMLE bridge reference. User terms
+# should do the same when (and only when) they are covariate-only.
+ERGM.is_dyad_dependent(::ExampleTerm) = false
+ERGM.is_dyad_dependent(::TemplateTerm) = false
+ERGM.is_dyad_dependent(::WeightedEdges) = false
+ERGM.is_dyad_dependent(::DyadCovTerm) = false
+ERGM.is_dyad_dependent(::InteractionTerm) = false
+
 # =============================================================================
 # Documentation Helpers
 # =============================================================================

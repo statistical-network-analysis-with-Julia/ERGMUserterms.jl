@@ -28,6 +28,7 @@ Every custom term needs a struct and three methods:
 using ERGM
 using ERGMUserterms
 using Network
+import ERGM: name, compute, change_stat   # required to extend the term interface
 
 # Define the struct
 struct SharedNeighborTerm <: AbstractUserTerm end
@@ -92,7 +93,7 @@ Use `validate_term` to check your implementation:
 
 ```julia
 # Create a test network
-net = Network{Int}(; n=10, directed=true)
+net = network(10; directed=true)
 for (i, j) in [(1,2), (2,3), (1,3), (3,1), (2,1)]
     add_edge!(net, i, j)
 end
@@ -160,7 +161,7 @@ using ERGM
 using Network
 
 # Create a network
-net = Network{Int}(; n=50, directed=true)
+net = network(50; directed=true)
 # ... add edges ...
 
 # Use your custom term in a model
@@ -178,6 +179,7 @@ end
 using ERGM
 using ERGMUserterms
 using Network
+import ERGM: name, compute, change_stat   # required to extend the term interface
 
 # === Define a parameterized term ===
 struct WeightedDensity <: AbstractUserTerm
@@ -201,7 +203,7 @@ function change_stat(t::WeightedDensity, net, i::Int, j::Int)
 end
 
 # === Validate ===
-net = Network{Int}(; n=20, directed=true)
+net = network(20; directed=true)
 for _ in 1:38
     i, j = rand(1:20), rand(1:20)
     i != j && add_edge!(net, i, j)
@@ -245,18 +247,17 @@ The `@ergm_term` macro provides a convenient way to define terms with automatic 
     end
 
     function change_stat(::MyDegreeVar, net, i::Int, j::Int)
-        before = compute(MyDegreeVar(), net)
-        # Toggle edge to compute after
-        if has_edge(net, i, j)
-            rem_edge!(net, i, j)
-            after = compute(MyDegreeVar(), net)
-            add_edge!(net, i, j)
-        else
-            add_edge!(net, i, j)
-            after = compute(MyDegreeVar(), net)
-            rem_edge!(net, i, j)
-        end
-        return after - before
+        # Add-direction by brute force: statistic with edge (i,j) forced
+        # present minus forced absent, then restore the original state.
+        # (Fine for a small demo; real terms should compute the delta
+        # directly in O(degree) — see the efficiency guidelines.)
+        had = has_edge(net, i, j)
+        had && rem_edge!(net, i, j)
+        without = compute(MyDegreeVar(), net)
+        add_edge!(net, i, j)
+        with = compute(MyDegreeVar(), net)
+        had || rem_edge!(net, i, j)
+        return with - without
     end
 end
 ```

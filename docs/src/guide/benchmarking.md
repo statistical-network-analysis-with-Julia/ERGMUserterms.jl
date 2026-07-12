@@ -39,7 +39,7 @@ The function returns a `NamedTuple` with:
 using ERGM, ERGMUserterms, Network
 
 # Create a test network
-net = Network{Int}(; n=100, directed=true)
+net = network(100; directed=true)
 for _ in 1:500
     i, j = rand(1:100), rand(1:100)
     i != j && add_edge!(net, i, j)
@@ -84,10 +84,9 @@ The key insight: when toggling edge `(i,j)`, only statistics involving vertices 
 ```julia
 # SLOW: O(m) - recomputes full statistic
 function change_stat(::TriangleTerm, net, i::Int, j::Int)
-    before = compute(TriangleTerm(), net)
-    # toggle, compute again, toggle back
+    # force edge absent, compute; force present, compute; restore
     # ...
-    return after - before
+    return with_edge - without_edge   # add-direction, but O(m)
 end
 
 # FAST: O(d) - only counts shared neighbors of i and j
@@ -126,7 +125,7 @@ Network size significantly affects performance. Benchmark at multiple scales:
 ```julia
 function benchmark_at_scales(term; sizes=[10, 50, 100, 500])
     for n in sizes
-        net = Network{Int}(; n=n, directed=true)
+        net = network(n; directed=true)
         n_edges = round(Int, 0.1 * n * (n - 1))
         for _ in 1:n_edges
             i, j = rand(1:n), rand(1:n)
@@ -168,7 +167,7 @@ terms = [
     WeightedEdges(),
 ]
 
-net = Network{Int}(; n=50, directed=true)
+net = network(50; directed=true)
 for _ in 1:200
     i, j = rand(1:50), rand(1:50)
     i != j && add_edge!(net, i, j)

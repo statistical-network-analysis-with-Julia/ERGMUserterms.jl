@@ -41,7 +41,7 @@ end
 
 ```julia
 term = ExampleTerm()
-net = Network{Int}(; n=5, directed=true)
+net = network(5; directed=true)
 add_edge!(net, 1, 2)
 add_edge!(net, 3, 4)
 
@@ -104,6 +104,10 @@ function change_stat(t::TemplateTerm, net, i::Int, j::Int)
     # parameter (state-independent; removals are handled by the sampler)
     return Float64(t.param)
 end
+
+# Covariate-only term: opt out of ERGM.jl's conservative dyad-dependent
+# fallback (omit this line for terms that read the state of other dyads)
+ERGM.is_dyad_dependent(::TemplateTerm) = false
 ```
 
 ### Usage
@@ -113,7 +117,7 @@ end
 term_float = TemplateTerm(2.5)
 term_int = TemplateTerm(3)
 
-net = Network{Int}(; n=5, directed=true)
+net = network(5; directed=true)
 add_edge!(net, 1, 2)
 add_edge!(net, 2, 3)
 
@@ -195,7 +199,7 @@ end
 ### Usage
 
 ```julia
-net = Network{Int}(; n=5, directed=true)
+net = network(5; directed=true)
 add_edge!(net, 1, 2)
 add_edge!(net, 2, 3)
 set_edge_attribute!(net, :weight, 1, 2, 3.0)
@@ -284,7 +288,7 @@ distance = [
     3.0  2.5  1.0  0.0
 ]
 
-net = Network{Int}(; n=4, directed=true)
+net = network(4; directed=true)
 add_edge!(net, 1, 2)
 add_edge!(net, 3, 4)
 
@@ -373,7 +377,7 @@ end
 ### Usage
 
 ```julia
-net = Network{Int}(; n=4, directed=true)
+net = network(4; directed=true)
 add_edge!(net, 1, 2)
 
 # Set vertex attributes

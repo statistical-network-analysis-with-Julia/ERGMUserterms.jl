@@ -92,7 +92,7 @@ function change_stat(t::MyTerm, net, i::Int, j::Int)
 end
 
 # Create a test network and validate
-net = Network{Int}(; n=20, directed=true)
+net = network(20; directed=true)
 validate_term(MyTerm(2.0), net)
 ```
 

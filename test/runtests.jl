@@ -157,6 +157,25 @@ struct IncompleteTerm <: AbstractUserTerm end
         @test result.converged
         @test length(result.coefficients) == 2
         @test result.model.formula.terms.names == ["edges", "example"]
+
+        # ERGM's StatsAPI accessors work on fits containing user terms
+        @test coef(result) === result.coefficients
+        @test stderror(result) === result.std_errors
+        @test size(vcov(result)) == (2, 2)
+
+        # The bundled example terms are covariate-only and declare it;
+        # unknown user terms keep ERGM's conservative fallback (true)
+        @test !ERGM.is_dyad_dependent(ExampleTerm())
+        @test !ERGM.is_dyad_dependent(WeightedEdges())
+        @test ERGM.is_dyad_dependent(SharedNeighborTerm())
+
+        # ERGM's model-construction validation and attribute materialization
+        # cover only its built-in attribute terms: a user term referencing a
+        # nonexistent attribute passes through unchanged (and unvalidated)
+        model = ERGMModel(ERGMFormula([Edges(), InteractionTerm(:no_such_a,
+                                                                :no_such_b)]),
+                          net)
+        @test model.formula.terms[2] isa InteractionTerm
     end
 
     @testset "@ergm_term definition checks" begin

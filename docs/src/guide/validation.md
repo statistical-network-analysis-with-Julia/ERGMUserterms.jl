@@ -36,7 +36,7 @@ valid = validate_term(term, net; verbose=true)
 using ERGM, ERGMUserterms, Network
 
 term = ExampleTerm()
-net = Network{Int}(; n=10, directed=true)
+net = network(10; directed=true)
 for (i,j) in [(1,2),(2,3),(3,1),(1,4),(4,5)]
     add_edge!(net, i, j)
 end
@@ -82,13 +82,16 @@ consistent = change_stat_check(term, net; n_tests=10, verbose=true, tol=1e-10)
 
 ### How It Works
 
-For each test:
+For each random dyad `(i,j)` (on a copy of the network):
 
-1. Compute `stat_before = compute(term, net)`
-2. Get `predicted = change_stat(term, net, i, j)`
-3. Toggle edge `(i,j)` on a copy of the network
-4. Compute `stat_after = compute(term, toggled_net)`
-5. Check `|predicted - (stat_after - stat_before)| < tol`
+1. Get `predicted = change_stat(term, net, i, j)`
+2. Compute `expected = compute(term, net⁺ij) − compute(term, net⁻ij)` by
+   forcing the edge present/absent (the dyad's edge attributes are
+   snapshotted and restored across the toggles)
+3. Check `|predicted − expected| < tol`
+4. **State-independence**: toggle the dyad and call
+   `change_stat(term, net, i, j)` again — the value must not change
+   (toggle-direction terms fail here)
 
 ### Parameters
 
@@ -156,7 +159,7 @@ consistent = consistency_check(term, net; exhaustive=true)
 consistency_check(term, net)
 
 # Before release: use exhaustive on small networks
-small_net = Network{Int}(; n=10, directed=true)
+small_net = network(10; directed=true)
 # ... add edges ...
 consistency_check(term, small_net; exhaustive=true)
 ```
@@ -231,7 +234,7 @@ test_term(term; n_vertices=50, density=0.05)  # Large sparse
 test_term(term; n_vertices=10, density=0.5)   # Medium moderate
 
 # Step 4: Exhaustive consistency on small network
-small_net = Network{Int}(; n=8, directed=true)
+small_net = network(8; directed=true)
 for _ in 1:15
     i, j = rand(1:8), rand(1:8)
     i != j && add_edge!(small_net, i, j)
@@ -255,7 +258,7 @@ validate_term(term, net; verbose=true)
 println("name: ", name(term))
 
 # Test compute on a known network
-net = Network{Int}(; n=3, directed=true)
+net = network(3; directed=true)
 add_edge!(net, 1, 2)
 println("compute (1 edge): ", compute(term, net))
 
@@ -268,14 +271,15 @@ println("change_stat(2,3): ", change_stat(term, net, 2, 3))  # Non-existing edge
 
 ```julia
 # Verify the fundamental relationship manually
-net = Network{Int}(; n=4, directed=true)
+net = network(4; directed=true)
 add_edge!(net, 1, 2)
 add_edge!(net, 2, 3)
 
 before = compute(term, net)
 delta = change_stat(term, net, 1, 3)
 
-# Toggle edge and compute after
+# Edge (1,3) is absent, so forcing it present gives the add-direction
+# difference directly
 add_edge!(net, 1, 3)
 after = compute(term, net)
 
@@ -290,11 +294,11 @@ println("Match: $(abs(delta - (after - before)) < 1e-10)")
 
 ```julia
 # Empty network
-empty_net = Network{Int}(; n=5)
+empty_net = network(5)
 println("Empty: ", compute(term, empty_net))
 
 # Single edge
-single_net = Network{Int}(; n=5, directed=true)
+single_net = network(5; directed=true)
 add_edge!(single_net, 1, 2)
 println("Single edge: ", compute(term, single_net))
 
