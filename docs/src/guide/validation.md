@@ -109,7 +109,19 @@ When inconsistencies are found, verbose output shows the details:
 <!-- skip-check -->
 ```julia
 change_stat_check(broken_term, net; verbose=true)
-# [ Warning: Inconsistency at edge (3,7): predicted=2.0, actual=1.0
+# [ Warning: Inconsistency at dyad (3,7): change_stat=2.0, brute-force=1.0
+# false
+```
+
+Toggle-direction terms (the pre-0.2 convention) fail the state-independence
+step with a dedicated message:
+
+<!-- skip-check -->
+```julia
+change_stat_check(old_convention_term, net; verbose=true)
+# [ Warning: State-dependent change_stat at dyad (2,5): -1.0 with edge state
+#            as-is vs 1.0 after toggling. change_stat must return the
+#            add-direction change regardless of whether the edge exists
 # false
 ```
 
@@ -117,7 +129,7 @@ Common causes of inconsistency:
 
 | Cause | Symptom | Fix |
 |-------|---------|-----|
-| Wrong sign | predicted = -actual | Check `has_edge` direction in change_stat |
+| Toggle-direction sign flip | State-dependence warning; sign follows `has_edge` | Delete the `has_edge(net, i, j) ? -delta : delta` idiom; always return the add-direction value |
 | Missing contribution | predicted < actual | Account for all affected edges/triangles |
 | Double counting | predicted > actual | Avoid counting the same contribution twice |
 | Off-by-one | close but not exact | Check edge iteration bounds |

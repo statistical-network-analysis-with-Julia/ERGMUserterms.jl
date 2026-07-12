@@ -36,6 +36,52 @@ export benchmark_term, profile_term
 export term_signature, term_documentation
 
 # =============================================================================
+# Re-exported term interface (generics owned by ERGM.jl)
+# =============================================================================
+# The docstrings below document the interface from the term author's
+# perspective; the generics themselves live in ERGM.jl.
+
+"""
+    name(term::AbstractERGMTerm) -> String
+
+Return the term's descriptive, lowercase name, including any parameters
+(e.g. `"template.2.0"`, `"weightedges.weight"`).
+
+This generic is owned by ERGM.jl and re-exported here; add a method for
+your term type. Without one, ERGM.jl falls back to `string(typeof(term))`.
+"""
+name
+
+"""
+    compute(term::AbstractERGMTerm, net) -> Float64
+
+Compute the term's full network statistic `g(y)` on `net`.
+
+This generic is owned by ERGM.jl and re-exported here; add a method for
+your term type. It must be deterministic, must not modify the network, and
+should handle empty and complete networks.
+"""
+compute
+
+"""
+    change_stat(term::AbstractERGMTerm, net, i::Int, j::Int) -> Float64
+
+Compute the **add-direction** change statistic for dyad `(i, j)`:
+`g(y⁺ᵢⱼ) − g(y⁻ᵢⱼ)`, i.e. the statistic with edge (i, j) present minus the
+statistic with it absent, holding all other dyads fixed.
+
+The value must **not** depend on whether the edge currently exists:
+ERGM.jl's MPLE design matrix uses it directly, and the Metropolis–Hastings
+sampler negates it for removal proposals. The toggle-direction idiom
+`has_edge(net, i, j) ? -delta : delta` is wrong under this contract and is
+rejected by [`change_stat_check`](@ref) / [`validate_term`](@ref).
+
+This generic is owned by ERGM.jl and re-exported here; add a method for
+your term type. For performance it should be O(degree), not O(edges).
+"""
+change_stat
+
+# =============================================================================
 # Term Development Infrastructure
 # =============================================================================
 

@@ -33,7 +33,7 @@ Custom terms let you model network features beyond the built-in terms in ERGM.jl
 | **ERGM Term** | A network statistic measuring a structural feature |
 | **compute()** | Calculates the full statistic value for a network |
 | **change_stat()** | The add-direction change statistic g(y⁺ij) − g(y⁻ij), state-independent |
-| **Consistency** | `change_stat(net, i, j) == compute(net') - compute(net)` |
+| **Consistency** | `change_stat(net, i, j) == compute(net⁺ij) - compute(net⁻ij)` |
 | **Validation** | Automated checks that a term is correctly implemented |
 
 ### Use Cases

@@ -121,31 +121,32 @@ function change_stat(t::NodeMatchTerm, net, i::Int, j::Int)
 end
 ```
 
-## Benchmarking at Different Scales
+## Benchmarking at Different Scales: profile_term
 
-Network size significantly affects performance. Benchmark at multiple scales:
+Network size significantly affects performance. `profile_term` runs
+`benchmark_term` on random networks of several sizes and returns one result
+per size, which makes change statistics that do not scale (e.g. O(edges)
+instead of O(degree)) easy to spot:
 
 ```julia
-function benchmark_at_scales(term; sizes=[10, 50, 100, 500])
-    for n in sizes
-        net = network(n; directed=true)
-        n_edges = round(Int, 0.1 * n * (n - 1))
-        for _ in 1:n_edges
-            i, j = rand(1:n), rand(1:n)
-            i != j && add_edge!(net, i, j)
-        end
+results = profile_term(ExampleTerm(); sizes=[10, 50, 100], density=0.1, n_iter=500)
 
-        result = benchmark_term(term, net; n_iter=500)
-
-        println("n=$n, m=$(ne(net)): " *
-                "compute=$(round(result.compute_mean*1e6, digits=1))μs, " *
-                "change_stat=$(round(result.change_stat_mean*1e6, digits=1))μs, " *
-                "speedup=$(round(result.speedup, digits=1))×")
-    end
+for r in results
+    println("n=$(r.n_vertices), m=$(r.ne): " *
+            "compute=$(round(r.compute_mean*1e6, digits=1))μs, " *
+            "change_stat=$(round(r.change_stat_mean*1e6, digits=1))μs, " *
+            "speedup=$(round(r.speedup, digits=1))×")
 end
-
-benchmark_at_scales(ExampleTerm())
 ```
+
+Each entry is the `benchmark_term` `NamedTuple` for that size, with
+`n_vertices` (network size) and `ne` (realized edge count) added.
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `sizes` | Network sizes (vertex counts) to profile | `[10, 20, 40]` |
+| `density` | Edge density of each random test network | `0.1` |
+| `n_iter` | Iterations passed to `benchmark_term` per size | `200` |
 
 ### Expected Scaling Behavior
 

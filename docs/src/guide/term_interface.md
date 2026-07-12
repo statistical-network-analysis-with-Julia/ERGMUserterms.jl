@@ -364,11 +364,14 @@ dst(e)               # Destination of edge
 ```julia
 # Vertex attributes
 attrs = get_vertex_attribute(net, :name)
-# Returns Dict{Int, Any} or nothing
+# Returns Dict{Int, Any}; an *empty* Dict (never nothing) when the
+# attribute is absent
 
 # Edge attributes
 weights = get_edge_attribute(net, :weight)
-# Returns Dict{Tuple{Int,Int}, Any} or nothing
+# Returns Dict{Tuple{Int,Int}, Any}; an *empty* Dict (never nothing) when
+# the attribute is absent. Keys are canonical: (i,j) for directed
+# networks, (min,max) for undirected
 
 # Network attributes
 val = get_network_attribute(net, :name)
@@ -411,11 +414,15 @@ end
 
 ### Missing Attributes
 
+`get_vertex_attribute`/`get_edge_attribute` return an *empty* Dict (never
+`nothing`) when the attribute is absent, and vertices/edges may lack
+individual values. Decide explicitly what missing data means for your term:
+
 ```julia
 function compute(t::MyAttrTerm, net)
     attrs = get_vertex_attribute(net, t.attr)
-    isnothing(attrs) && return 0.0  # Attribute not set
-    # ...
+    isempty(attrs) && return 0.0  # Attribute not set anywhere
+    # ... use get(attrs, v, default) for individual missing values
 end
 ```
 

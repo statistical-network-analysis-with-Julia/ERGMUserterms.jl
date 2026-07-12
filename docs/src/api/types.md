@@ -2,9 +2,13 @@
 
 This page documents the core types in ERGMUserterms.jl.
 
-## Term Base Types
+## Package
 
-### AbstractUserTerm
+```@docs
+ERGMUserterms
+```
+
+## Term Base Types
 
 ```@docs
 AbstractUserTerm
@@ -12,31 +16,21 @@ AbstractUserTerm
 
 ## Example Terms
 
-### ExampleTerm
-
 ```@docs
 ExampleTerm
 ```
-
-### TemplateTerm
 
 ```@docs
 TemplateTerm
 ```
 
-### WeightedEdges
-
 ```@docs
 WeightedEdges
 ```
 
-### DyadCovTerm
-
 ```@docs
 DyadCovTerm
 ```
-
-### InteractionTerm
 
 ```@docs
 InteractionTerm
@@ -45,20 +39,15 @@ InteractionTerm
 ## Term Interface
 
 All terms (both user-defined and built-in) must implement these methods.
-
-### name
+The generics are owned by ERGM.jl and re-exported by ERGMUserterms.jl.
 
 ```@docs
 name
 ```
 
-### compute
-
 ```@docs
 compute
 ```
-
-### change_stat
 
 ```@docs
 change_stat

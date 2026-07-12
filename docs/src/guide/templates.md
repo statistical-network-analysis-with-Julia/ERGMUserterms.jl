@@ -129,8 +129,8 @@ add_edge!(net, 1, 2)
 add_edge!(net, 2, 3)
 
 compute(term_float, net)  # 2 * 2.5 = 5.0
-change_stat(term_float, net, 3, 4)  # +2.5 (adding edge)
-change_stat(term_float, net, 1, 2)  # -2.5 (removing edge)
+change_stat(term_float, net, 3, 4)  # +2.5 (edge absent)
+change_stat(term_float, net, 1, 2)  # +2.5 (edge present: same add-direction value)
 ```
 
 ### When to Use This Pattern
@@ -351,9 +351,10 @@ end
 name(t::InteractionTerm) = "interact.$(t.attr1).$(t.attr2)"
 
 function compute(t::InteractionTerm, net)
+    # get_vertex_attribute returns an empty Dict (never nothing) when the
+    # attribute is absent; missing values fall back to 0.0 via get()
     attrs1 = get_vertex_attribute(net, t.attr1)
     attrs2 = get_vertex_attribute(net, t.attr2)
-    (isnothing(attrs1) || isnothing(attrs2)) && return 0.0
 
     total = 0.0
     for e in edges(net)
@@ -419,7 +420,6 @@ name(t::DiffInteraction) = "diffinteract.$(t.attr1).$(t.attr2)"
 function compute(t::DiffInteraction, net)
     attrs1 = get_vertex_attribute(net, t.attr1)
     attrs2 = get_vertex_attribute(net, t.attr2)
-    (isnothing(attrs1) || isnothing(attrs2)) && return 0.0
     total = 0.0
     for e in edges(net)
         i, j = src(e), dst(e)
@@ -467,8 +467,9 @@ For terms based on vertex properties:
 <!-- skip-check -->
 ```julia
 function compute(t::NodeMatchTerm, net)
+    # get_vertex_attribute returns an empty Dict when the attribute is
+    # absent; vertices without a value fall back to `nothing` via get()
     attrs = get_vertex_attribute(net, t.attr)
-    isnothing(attrs) && return 0.0
     count = 0
     for e in edges(net)
         get(attrs, src(e), nothing) == get(attrs, dst(e), nothing) && (count += 1)
