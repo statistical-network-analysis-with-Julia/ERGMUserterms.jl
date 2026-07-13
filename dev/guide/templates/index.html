@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Templates and Examples · ERGMUserterms.jl</title><meta name="title" content="Templates and Examples · ERGMUserterms.jl"/><meta property="og:title" content="Templates and Examples · ERGMUserterms.jl"/><meta property="twitter:title" content="Templates and Examples · ERGMUserterms.jl"/><meta name="description" content="Documentation for ERGMUserterms.jl."/><meta property="og:description" content="Documentation for ERGMUserterms.jl."/><meta property="twitter:description" content="Documentation for ERGMUserterms.jl."/><meta property="og:url" content="https://Statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/guide/templates/"/><meta property="twitter:url" content="https://Statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/guide/templates/"/><link rel="canonical" href="https://Statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/guide/templates/"/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.svg" alt="ERGMUserterms.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">ERGMUserterms.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../getting_started/">Getting Started</a></li><li><span class="tocitem">User Guide</span><ul><li><a class="tocitem" href="../term_interface/">Term Interface</a></li><li class="is-active"><a class="tocitem" href>Templates and Examples</a><ul class="internal"><li><a class="tocitem" href="#Template-Overview"><span>Template Overview</span></a></li><li><a class="tocitem" href="#Package-Template:-examples/MyTermPackage"><span>Package Template: <code>examples/MyTermPackage</code></span></a></li><li><a class="tocitem" href="#ExampleTerm"><span>ExampleTerm</span></a></li><li><a class="tocitem" href="#TemplateTerm"><span>TemplateTerm</span></a></li><li><a class="tocitem" href="#WeightedEdges"><span>WeightedEdges</span></a></li><li><a class="tocitem" href="#DyadCovTerm"><span>DyadCovTerm</span></a></li><li><a class="tocitem" href="#InteractionTerm"><span>InteractionTerm</span></a></li><li><a class="tocitem" href="#Common-Patterns-Summary"><span>Common Patterns Summary</span></a></li><li><a class="tocitem" href="#Choosing-a-Template"><span>Choosing a Template</span></a></li></ul></li><li><a class="tocitem" href="../validation/">Validation and Testing</a></li><li><a class="tocitem" href="../benchmarking/">Benchmarking</a></li></ul></li><li><span class="tocitem">API Reference</span><ul><li><a class="tocitem" href="../../api/types/">Types</a></li><li><a class="tocitem" href="../../api/validation/">Validation</a></li><li><a class="tocitem" href="../../api/utilities/">Utilities</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">User Guide</a></li><li class="is-active"><a href>Templates and Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Templates and Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Statistical-network-analysis-with-Julia/ERGMUserterms.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Statistical-network-analysis-with-Julia/ERGMUserterms.jl/blob/main/docs/src/guide/templates.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Templates-and-Examples"><a class="docs-heading-anchor" href="#Templates-and-Examples">Templates and Examples</a><a id="Templates-and-Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Templates-and-Examples" title="Permalink"></a></h1><p>ERGMUserterms.jl provides five complete example terms that serve as templates for building your own. Each demonstrates a different pattern for custom term development.</p><h2 id="Template-Overview"><a class="docs-heading-anchor" href="#Template-Overview">Template Overview</a><a id="Template-Overview-1"></a><a class="docs-heading-anchor-permalink" href="#Template-Overview" title="Permalink"></a></h2><table><tr><th style="text-align: right">Template</th><th style="text-align: right">Pattern</th><th style="text-align: right">Key Feature</th></tr><tr><td style="text-align: right"><a href="#ExampleTerm"><code>ExampleTerm</code></a></td><td style="text-align: right">Simple structural</td><td style="text-align: right">No parameters, basic edge iteration</td></tr><tr><td style="text-align: right"><a href="#TemplateTerm"><code>TemplateTerm</code></a></td><td style="text-align: right">Parameterized</td><td style="text-align: right">Generic type parameter, keyword constructor</td></tr><tr><td style="text-align: right"><a href="#WeightedEdges"><code>WeightedEdges</code></a></td><td style="text-align: right">Edge attributes</td><td style="text-align: right">Accessing edge-level covariates</td></tr><tr><td style="text-align: right"><a href="#DyadCovTerm"><code>DyadCovTerm</code></a></td><td style="text-align: right">Dyadic covariate</td><td style="text-align: right">Using an external matrix</td></tr><tr><td style="text-align: right"><a href="#InteractionTerm"><code>InteractionTerm</code></a></td><td style="text-align: right">Node interactions</td><td style="text-align: right">Combining multiple vertex attributes</td></tr></table><h2 id="Package-Template:-examples/MyTermPackage"><a class="docs-heading-anchor" href="#Package-Template:-examples/MyTermPackage">Package Template: <code>examples/MyTermPackage</code></a><a id="Package-Template:-examples/MyTermPackage-1"></a><a class="docs-heading-anchor-permalink" href="#Package-Template:-examples/MyTermPackage" title="Permalink"></a></h2><p>The five terms above are <em>term</em> templates. For shipping terms in a package of your own, the repository also carries a <strong>package template</strong> — <code>examples/MyTermPackage/</code> — a copyable skeleton (<code>Project.toml</code>, module, tests) whose term <code>ReciprocatedHomophily</code> declares the full set of ERGM.jl traits:</p><p>&lt;!– skip-check –&gt;</p><pre><code class="language-julia hljs">ERGM.required_vertex_attributes(t::ReciprocatedHomophily) = (t.attr,)
+ERGM.requires_directed(::ReciprocatedHomophily)           = true
+ERGM.is_dyad_dependent(::ReciprocatedHomophily)           = true
+Networks.supports_missing(::ReciprocatedHomophily)        = true</code></pre><p>and, on the strength of those declarations, is validated by <a href="../validation/#validate_term"><code>validate_term</code></a> and accepted (or correctly <em>rejected</em> — on an undirected network, or one lacking the attribute) by <code>ERGMModel</code> construction, exactly like an ERGM.jl built-in. See <a href="../term_interface/#Declaring-Your-Term&#39;s-Traits">Declaring Your Term&#39;s Traits</a>.</p><h2 id="ExampleTerm"><a class="docs-heading-anchor" href="#ExampleTerm">ExampleTerm</a><a id="ExampleTerm-1"></a><a class="docs-heading-anchor-permalink" href="#ExampleTerm" title="Permalink"></a></h2><p>The simplest possible custom term. Counts edges weighted by vertex ID sum.</p><h3 id="Implementation"><a class="docs-heading-anchor" href="#Implementation">Implementation</a><a id="Implementation-1"></a><a class="docs-heading-anchor-permalink" href="#Implementation" title="Permalink"></a></h3><p>The template implementations below re-define local copies of the bundled terms so you can adapt them:</p><pre><code class="language-julia hljs">using ERGM, ERGMUserterms, Network
+using Graphs: src, dst
+import ERGM: name, compute, change_stat
+
+struct ExampleTerm &lt;: AbstractUserTerm end
+
+name(::ExampleTerm) = &quot;example&quot;
+
+function compute(::ExampleTerm, net)
+    total = 0.0
+    for e in edges(net)
+        total += src(e) + dst(e)
+    end
+    return total
+end
+
+function change_stat(::ExampleTerm, net, i::Int, j::Int)
+    # Add-direction: adding edge (i,j) adds i + j, whatever the current state
+    return Float64(i + j)
+end</code></pre><h3 id="Usage"><a class="docs-heading-anchor" href="#Usage">Usage</a><a id="Usage-1"></a><a class="docs-heading-anchor-permalink" href="#Usage" title="Permalink"></a></h3><pre><code class="language-julia hljs">term = ExampleTerm()
+net = network(5; directed=true)
+add_edge!(net, 1, 2)
+add_edge!(net, 3, 4)
+
+compute(term, net)  # (1+2) + (3+4) = 10.0
+change_stat(term, net, 2, 3)  # +(2+3) = 5.0
+change_stat(term, net, 1, 2)  # +(1+2) = 3.0 (state-independent add-direction)</code></pre><h3 id="When-to-Use-This-Pattern"><a class="docs-heading-anchor" href="#When-to-Use-This-Pattern">When to Use This Pattern</a><a id="When-to-Use-This-Pattern-1"></a><a class="docs-heading-anchor-permalink" href="#When-to-Use-This-Pattern" title="Permalink"></a></h3><ul><li>Structural terms with no parameters</li><li>Terms that iterate over all edges</li><li>Terms where the change statistic is a simple local computation</li></ul><h3 id="Adapting-This-Template"><a class="docs-heading-anchor" href="#Adapting-This-Template">Adapting This Template</a><a id="Adapting-This-Template-1"></a><a class="docs-heading-anchor-permalink" href="#Adapting-This-Template" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Example: Count edges where source ID &gt; target ID
+struct DescendingEdges &lt;: AbstractUserTerm end
+
+name(::DescendingEdges) = &quot;descending&quot;
+
+function compute(::DescendingEdges, net)
+    count = 0.0
+    for e in edges(net)
+        src(e) &gt; dst(e) &amp;&amp; (count += 1.0)
+    end
+    return count
+end
+
+function change_stat(::DescendingEdges, net, i::Int, j::Int)
+    # Add-direction: 1 if this edge would contribute, else 0
+    return i &gt; j ? 1.0 : 0.0
+end</code></pre><h2 id="TemplateTerm"><a class="docs-heading-anchor" href="#TemplateTerm">TemplateTerm</a><a id="TemplateTerm-1"></a><a class="docs-heading-anchor-permalink" href="#TemplateTerm" title="Permalink"></a></h2><p>A parameterized template with a generic type parameter. Copy and modify for terms that need configuration.</p><h3 id="Implementation-2"><a class="docs-heading-anchor" href="#Implementation-2">Implementation</a><a class="docs-heading-anchor-permalink" href="#Implementation-2" title="Permalink"></a></h3><pre><code class="language-julia hljs">struct TemplateTerm{T} &lt;: AbstractUserTerm
+    param::T
+    attr::Symbol
+
+    TemplateTerm(param::T; attr::Symbol=:none) where T = new{T}(param, attr)
+end
+
+name(t::TemplateTerm) = &quot;template.$(t.param)&quot;
+
+function compute(t::TemplateTerm, net)
+    # Count edges multiplied by parameter
+    return Float64(ne(net)) * t.param
+end
+
+function change_stat(t::TemplateTerm, net, i::Int, j::Int)
+    # Add-direction: adding edge (i,j) increases the statistic by the
+    # parameter (state-independent; removals are handled by the sampler)
+    return Float64(t.param)
+end
+
+# Covariate-only term: opt out of ERGM.jl&#39;s conservative dyad-dependent
+# fallback (omit this line for terms that read the state of other dyads)
+ERGM.is_dyad_dependent(::TemplateTerm) = false</code></pre><h3 id="Usage-2"><a class="docs-heading-anchor" href="#Usage-2">Usage</a><a class="docs-heading-anchor-permalink" href="#Usage-2" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Create with different parameter types
+term_float = TemplateTerm(2.5)
+term_int = TemplateTerm(3)
+
+net = network(5; directed=true)
+add_edge!(net, 1, 2)
+add_edge!(net, 2, 3)
+
+compute(term_float, net)  # 2 * 2.5 = 5.0
+change_stat(term_float, net, 3, 4)  # +2.5 (edge absent)
+change_stat(term_float, net, 1, 2)  # +2.5 (edge present: same add-direction value)</code></pre><h3 id="When-to-Use-This-Pattern-2"><a class="docs-heading-anchor" href="#When-to-Use-This-Pattern-2">When to Use This Pattern</a><a class="docs-heading-anchor-permalink" href="#When-to-Use-This-Pattern-2" title="Permalink"></a></h3><ul><li>Terms with a scalar parameter</li><li>Terms where the parameter scales the statistic linearly</li><li>Prototype terms before implementing efficient change_stat()</li></ul><h3 id="Adapting-This-Template-2"><a class="docs-heading-anchor" href="#Adapting-This-Template-2">Adapting This Template</a><a class="docs-heading-anchor-permalink" href="#Adapting-This-Template-2" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Example: Weighted edge count with decay
+struct DecayEdges &lt;: AbstractUserTerm
+    decay::Float64
+    DecayEdges(; decay::Float64=0.5) = new(decay)
+end
+
+name(t::DecayEdges) = &quot;decay_edges.$(t.decay)&quot;
+
+function compute(t::DecayEdges, net)
+    total = 0.0
+    for e in edges(net)
+        # Weight by position in vertex ordering
+        total += t.decay ^ abs(src(e) - dst(e))
+    end
+    return total
+end
+
+function change_stat(t::DecayEdges, net, i::Int, j::Int)
+    return t.decay ^ abs(i - j)
+end</code></pre><h2 id="WeightedEdges"><a class="docs-heading-anchor" href="#WeightedEdges">WeightedEdges</a><a id="WeightedEdges-1"></a><a class="docs-heading-anchor-permalink" href="#WeightedEdges" title="Permalink"></a></h2><p>Demonstrates accessing edge attributes from the network.</p><h3 id="Implementation-3"><a class="docs-heading-anchor" href="#Implementation-3">Implementation</a><a class="docs-heading-anchor-permalink" href="#Implementation-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">struct WeightedEdges &lt;: AbstractUserTerm
+    attr::Symbol
+    default::Float64
+    WeightedEdges(attr::Symbol=:weight; default::Float64=1.0) = new(attr, default)
+end
+
+name(t::WeightedEdges) = &quot;weightedges.$(t.attr)&quot;
+
+# Edge attributes are keyed canonically: (i,j) directed, (min,max) undirected
+_edge_key(net, i, j) = is_directed(net) ? (i, j) : minmax(i, j)
+
+function compute(t::WeightedEdges, net)
+    # get_edge_attribute returns an (empty) Dict even when the attribute is
+    # absent, so sum over the network&#39;s edges with a default — this keeps
+    # compute consistent with change_stat when the sampler adds unweighted
+    # edges
+    weights = get_edge_attribute(net, t.attr)
+    total = 0.0
+    for e in edges(net)
+        total += Float64(get(weights, _edge_key(net, src(e), dst(e)), t.default))
+    end
+    return total
+end
+
+function change_stat(t::WeightedEdges, net, i::Int, j::Int)
+    # Add-direction: the weight edge (i,j) carries (stored value, else the
+    # default a fresh edge would get)
+    weights = get_edge_attribute(net, t.attr)
+    return Float64(get(weights, _edge_key(net, i, j), t.default))
+end</code></pre><h3 id="Usage-3"><a class="docs-heading-anchor" href="#Usage-3">Usage</a><a class="docs-heading-anchor-permalink" href="#Usage-3" title="Permalink"></a></h3><pre><code class="language-julia hljs">net = network(5; directed=true)
+add_edge!(net, 1, 2)
+add_edge!(net, 2, 3)
+set_edge_attribute!(net, :weight, 1, 2, 3.0)
+set_edge_attribute!(net, :weight, 2, 3, 1.5)
+
+term = WeightedEdges(:weight)
+compute(term, net)  # 3.0 + 1.5 = 4.5</code></pre><h3 id="When-to-Use-This-Pattern-3"><a class="docs-heading-anchor" href="#When-to-Use-This-Pattern-3">When to Use This Pattern</a><a class="docs-heading-anchor-permalink" href="#When-to-Use-This-Pattern-3" title="Permalink"></a></h3><ul><li>Terms that use edge-level data (weights, types, timestamps)</li><li>Terms with a configurable attribute name</li><li>Terms that fall back to a default when attributes are missing</li></ul><h3 id="Adapting-This-Template-3"><a class="docs-heading-anchor" href="#Adapting-This-Template-3">Adapting This Template</a><a class="docs-heading-anchor-permalink" href="#Adapting-This-Template-3" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Example: Sum of squared edge weights
+struct SquaredWeights &lt;: AbstractUserTerm
+    attr::Symbol
+    SquaredWeights(attr::Symbol=:weight) = new(attr)
+end
+
+name(t::SquaredWeights) = &quot;sqweights.$(t.attr)&quot;
+
+function compute(t::SquaredWeights, net)
+    weights = get_edge_attribute(net, t.attr)
+    total = 0.0
+    for e in edges(net)
+        total += Float64(get(weights, _edge_key(net, src(e), dst(e)), 1.0))^2
+    end
+    return total
+end
+
+function change_stat(t::SquaredWeights, net, i::Int, j::Int)
+    weights = get_edge_attribute(net, t.attr)
+    w = Float64(get(weights, _edge_key(net, i, j), 1.0))
+    return w^2
+end</code></pre><h2 id="DyadCovTerm"><a class="docs-heading-anchor" href="#DyadCovTerm">DyadCovTerm</a><a id="DyadCovTerm-1"></a><a class="docs-heading-anchor-permalink" href="#DyadCovTerm" title="Permalink"></a></h2><p>Demonstrates using an external matrix as a dyadic covariate.</p><h3 id="Implementation-4"><a class="docs-heading-anchor" href="#Implementation-4">Implementation</a><a class="docs-heading-anchor-permalink" href="#Implementation-4" title="Permalink"></a></h3><pre><code class="language-julia hljs">struct DyadCovTerm &lt;: AbstractUserTerm
+    covariate::Matrix{Float64}
+end
+
+name(::DyadCovTerm) = &quot;dyadcov&quot;
+
+function compute(t::DyadCovTerm, net)
+    total = 0.0
+    for e in edges(net)
+        i, j = src(e), dst(e)
+        if i &lt;= size(t.covariate, 1) &amp;&amp; j &lt;= size(t.covariate, 2)
+            total += t.covariate[i, j]
+        end
+    end
+    return total
+end
+
+function change_stat(t::DyadCovTerm, net, i::Int, j::Int)
+    # Undirected edges are stored canonically as (min, max); read the
+    # covariate the same way compute() sees the edge
+    if !is_directed(net)
+        i, j = minmax(i, j)
+    end
+    i &lt;= size(t.covariate, 1) &amp;&amp; j &lt;= size(t.covariate, 2) || return 0.0
+    return t.covariate[i, j]
+end</code></pre><h3 id="Usage-4"><a class="docs-heading-anchor" href="#Usage-4">Usage</a><a class="docs-heading-anchor-permalink" href="#Usage-4" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Distance matrix between actors
+distance = [
+    0.0  1.0  2.0  3.0
+    1.0  0.0  1.5  2.5
+    2.0  1.5  0.0  1.0
+    3.0  2.5  1.0  0.0
+]
+
+net = network(4; directed=true)
+add_edge!(net, 1, 2)
+add_edge!(net, 3, 4)
+
+term = DyadCovTerm(distance)
+compute(term, net)  # distance[1,2] + distance[3,4] = 1.0 + 1.0 = 2.0
+change_stat(term, net, 1, 3)  # +distance[1,3] = 2.0 (adding edge)</code></pre><h3 id="When-to-Use-This-Pattern-4"><a class="docs-heading-anchor" href="#When-to-Use-This-Pattern-4">When to Use This Pattern</a><a class="docs-heading-anchor-permalink" href="#When-to-Use-This-Pattern-4" title="Permalink"></a></h3><ul><li>Geographic distance effects</li><li>Pre-computed similarity scores</li><li>Any dyad-level covariate stored as a matrix</li></ul><h3 id="Adapting-This-Template-4"><a class="docs-heading-anchor" href="#Adapting-This-Template-4">Adapting This Template</a><a class="docs-heading-anchor-permalink" href="#Adapting-This-Template-4" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Example: Binary covariate (same group membership)
+struct SameGroup &lt;: AbstractUserTerm
+    membership::Vector{Int}
+end
+
+name(::SameGroup) = &quot;samegroup&quot;
+
+function compute(t::SameGroup, net)
+    count = 0.0
+    for e in edges(net)
+        i, j = src(e), dst(e)
+        i &lt;= length(t.membership) &amp;&amp; j &lt;= length(t.membership) || continue
+        t.membership[i] == t.membership[j] &amp;&amp; (count += 1.0)
+    end
+    return count
+end
+
+function change_stat(t::SameGroup, net, i::Int, j::Int)
+    i &lt;= length(t.membership) &amp;&amp; j &lt;= length(t.membership) || return 0.0
+    return t.membership[i] == t.membership[j] ? 1.0 : 0.0
+end</code></pre><h2 id="InteractionTerm"><a class="docs-heading-anchor" href="#InteractionTerm">InteractionTerm</a><a id="InteractionTerm-1"></a><a class="docs-heading-anchor-permalink" href="#InteractionTerm" title="Permalink"></a></h2><p>Demonstrates combining multiple vertex attributes into an interaction effect.</p><h3 id="Implementation-5"><a class="docs-heading-anchor" href="#Implementation-5">Implementation</a><a class="docs-heading-anchor-permalink" href="#Implementation-5" title="Permalink"></a></h3><pre><code class="language-julia hljs">struct InteractionTerm &lt;: AbstractUserTerm
+    attr1::Symbol
+    attr2::Symbol
+end
+
+name(t::InteractionTerm) = &quot;interact.$(t.attr1).$(t.attr2)&quot;
+
+function compute(t::InteractionTerm, net)
+    # get_vertex_attribute returns an empty Dict (never nothing) when the
+    # attribute is absent; missing values fall back to 0.0 via get()
+    attrs1 = get_vertex_attribute(net, t.attr1)
+    attrs2 = get_vertex_attribute(net, t.attr2)
+
+    total = 0.0
+    for e in edges(net)
+        i, j = src(e), dst(e)
+        v1_i = get(attrs1, i, 0.0)
+        v1_j = get(attrs1, j, 0.0)
+        v2_i = get(attrs2, i, 0.0)
+        v2_j = get(attrs2, j, 0.0)
+        total += v1_i * v2_j + v1_j * v2_i
+    end
+    return total
+end
+
+function change_stat(t::InteractionTerm, net, i::Int, j::Int)
+    attrs1 = get_vertex_attribute(net, t.attr1)
+    attrs2 = get_vertex_attribute(net, t.attr2)
+
+    v1_i = get(attrs1, i, 0.0)
+    v1_j = get(attrs1, j, 0.0)
+    v2_i = get(attrs2, i, 0.0)
+    v2_j = get(attrs2, j, 0.0)
+
+    # Add-direction: the per-edge contribution of (i,j)
+    return v1_i * v2_j + v1_j * v2_i
+end</code></pre><h3 id="Usage-5"><a class="docs-heading-anchor" href="#Usage-5">Usage</a><a class="docs-heading-anchor-permalink" href="#Usage-5" title="Permalink"></a></h3><pre><code class="language-julia hljs">net = network(4; directed=true)
+add_edge!(net, 1, 2)
+
+# Set vertex attributes
+set_vertex_attribute!(net, :age, 1, 25.0)
+set_vertex_attribute!(net, :age, 2, 30.0)
+set_vertex_attribute!(net, :income, 1, 50000.0)
+set_vertex_attribute!(net, :income, 2, 60000.0)
+
+term = InteractionTerm(:age, :income)
+compute(term, net)
+# = age[1]*income[2] + age[2]*income[1]
+# = 25*60000 + 30*50000 = 3000000.0</code></pre><h3 id="When-to-Use-This-Pattern-5"><a class="docs-heading-anchor" href="#When-to-Use-This-Pattern-5">When to Use This Pattern</a><a class="docs-heading-anchor-permalink" href="#When-to-Use-This-Pattern-5" title="Permalink"></a></h3><ul><li>Cross-attribute effects (e.g., age × status)</li><li>Sender-receiver attribute interactions</li><li>Multi-dimensional homophily models</li></ul><h3 id="Adapting-This-Template-5"><a class="docs-heading-anchor" href="#Adapting-This-Template-5">Adapting This Template</a><a class="docs-heading-anchor-permalink" href="#Adapting-This-Template-5" title="Permalink"></a></h3><pre><code class="language-julia hljs"># Example: Absolute difference interaction
+struct DiffInteraction &lt;: AbstractUserTerm
+    attr1::Symbol
+    attr2::Symbol
+end
+
+name(t::DiffInteraction) = &quot;diffinteract.$(t.attr1).$(t.attr2)&quot;
+
+function compute(t::DiffInteraction, net)
+    attrs1 = get_vertex_attribute(net, t.attr1)
+    attrs2 = get_vertex_attribute(net, t.attr2)
+    total = 0.0
+    for e in edges(net)
+        i, j = src(e), dst(e)
+        diff1 = abs(get(attrs1, i, 0.0) - get(attrs1, j, 0.0))
+        diff2 = abs(get(attrs2, i, 0.0) - get(attrs2, j, 0.0))
+        total += diff1 * diff2
+    end
+    return total
+end
+
+function change_stat(t::DiffInteraction, net, i::Int, j::Int)
+    attrs1 = get_vertex_attribute(net, t.attr1)
+    attrs2 = get_vertex_attribute(net, t.attr2)
+    diff1 = abs(get(attrs1, i, 0.0) - get(attrs1, j, 0.0))
+    diff2 = abs(get(attrs2, i, 0.0) - get(attrs2, j, 0.0))
+    return diff1 * diff2
+end</code></pre><h2 id="Common-Patterns-Summary"><a class="docs-heading-anchor" href="#Common-Patterns-Summary">Common Patterns Summary</a><a id="Common-Patterns-Summary-1"></a><a class="docs-heading-anchor-permalink" href="#Common-Patterns-Summary" title="Permalink"></a></h2><h3 id="Counting-Subgraphs"><a class="docs-heading-anchor" href="#Counting-Subgraphs">Counting Subgraphs</a><a id="Counting-Subgraphs-1"></a><a class="docs-heading-anchor-permalink" href="#Counting-Subgraphs" title="Permalink"></a></h3><p>For terms that count specific subgraph patterns:</p><p>&lt;!– skip-check –&gt;</p><pre><code class="language-julia hljs">function compute(::TriangleTerm, net)
+    count = 0
+    for i in vertices(net)
+        for j in outneighbors(net, i)
+            for k in outneighbors(net, j)
+                k &gt; i &amp;&amp; has_edge(net, i, k) &amp;&amp; (count += 1)
+            end
+        end
+    end
+    return count / 3  # Each triangle counted 3 times
+end</code></pre><h3 id="Using-Attributes"><a class="docs-heading-anchor" href="#Using-Attributes">Using Attributes</a><a id="Using-Attributes-1"></a><a class="docs-heading-anchor-permalink" href="#Using-Attributes" title="Permalink"></a></h3><p>For terms based on vertex properties:</p><p>&lt;!– skip-check –&gt;</p><pre><code class="language-julia hljs">function compute(t::NodeMatchTerm, net)
+    # get_vertex_attribute returns an empty Dict when the attribute is
+    # absent; vertices without a value fall back to `nothing` via get()
+    attrs = get_vertex_attribute(net, t.attr)
+    count = 0
+    for e in edges(net)
+        get(attrs, src(e), nothing) == get(attrs, dst(e), nothing) &amp;&amp; (count += 1)
+    end
+    return Float64(count)
+end</code></pre><h3 id="Conditional-Statistics"><a class="docs-heading-anchor" href="#Conditional-Statistics">Conditional Statistics</a><a id="Conditional-Statistics-1"></a><a class="docs-heading-anchor-permalink" href="#Conditional-Statistics" title="Permalink"></a></h3><p>For terms with conditional logic:</p><p>&lt;!– skip-check –&gt;</p><pre><code class="language-julia hljs">function compute(t::ConditionalTerm, net)
+    total = 0.0
+    for e in edges(net)
+        if meets_condition(net, src(e), dst(e), t.threshold)
+            total += contribution(net, src(e), dst(e))
+        end
+    end
+    return total
+end</code></pre><h2 id="Choosing-a-Template"><a class="docs-heading-anchor" href="#Choosing-a-Template">Choosing a Template</a><a id="Choosing-a-Template-1"></a><a class="docs-heading-anchor-permalink" href="#Choosing-a-Template" title="Permalink"></a></h2><table><tr><th style="text-align: right">Your Term Needs</th><th style="text-align: right">Start With</th></tr><tr><td style="text-align: right">No parameters, simple counting</td><td style="text-align: right"><code>ExampleTerm</code></td></tr><tr><td style="text-align: right">A tunable parameter</td><td style="text-align: right"><code>TemplateTerm</code></td></tr><tr><td style="text-align: right">Edge-level data</td><td style="text-align: right"><code>WeightedEdges</code></td></tr><tr><td style="text-align: right">An external covariate matrix</td><td style="text-align: right"><code>DyadCovTerm</code></td></tr><tr><td style="text-align: right">Multiple vertex attributes</td><td style="text-align: right"><code>InteractionTerm</code></td></tr></table></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../term_interface/">« Term Interface</a><a class="docs-footer-nextpage" href="../validation/">Validation and Testing »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 July 2026 23:43">Monday 13 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

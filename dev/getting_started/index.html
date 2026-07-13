@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Getting Started · ERGMUserterms.jl</title><meta name="title" content="Getting Started · ERGMUserterms.jl"/><meta property="og:title" content="Getting Started · ERGMUserterms.jl"/><meta property="twitter:title" content="Getting Started · ERGMUserterms.jl"/><meta name="description" content="Documentation for ERGMUserterms.jl."/><meta property="og:description" content="Documentation for ERGMUserterms.jl."/><meta property="twitter:description" content="Documentation for ERGMUserterms.jl."/><meta property="og:url" content="https://Statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/getting_started/"/><meta property="twitter:url" content="https://Statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/getting_started/"/><link rel="canonical" href="https://Statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl/getting_started/"/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="ERGMUserterms.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">ERGMUserterms.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Getting Started</a><ul class="internal"><li><a class="tocitem" href="#Installation"><span>Installation</span></a></li><li><a class="tocitem" href="#Basic-Workflow"><span>Basic Workflow</span></a></li><li><a class="tocitem" href="#Step-1:-Define-a-Custom-Term"><span>Step 1: Define a Custom Term</span></a></li><li><a class="tocitem" href="#Step-2:-Validate-the-Term"><span>Step 2: Validate the Term</span></a></li><li><a class="tocitem" href="#Step-3:-Test-Comprehensively"><span>Step 3: Test Comprehensively</span></a></li><li><a class="tocitem" href="#Step-4:-Use-in-ERGM"><span>Step 4: Use in ERGM</span></a></li><li><a class="tocitem" href="#Complete-Example"><span>Complete Example</span></a></li><li><a class="tocitem" href="#Working-with-the-@ergm_term-Macro"><span>Working with the @ergm_term Macro</span></a></li><li><a class="tocitem" href="#Best-Practices"><span>Best Practices</span></a></li><li><a class="tocitem" href="#Next-Steps"><span>Next Steps</span></a></li></ul></li><li><span class="tocitem">User Guide</span><ul><li><a class="tocitem" href="../guide/term_interface/">Term Interface</a></li><li><a class="tocitem" href="../guide/templates/">Templates and Examples</a></li><li><a class="tocitem" href="../guide/validation/">Validation and Testing</a></li><li><a class="tocitem" href="../guide/benchmarking/">Benchmarking</a></li></ul></li><li><span class="tocitem">API Reference</span><ul><li><a class="tocitem" href="../api/types/">Types</a></li><li><a class="tocitem" href="../api/validation/">Validation</a></li><li><a class="tocitem" href="../api/utilities/">Utilities</a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Getting Started</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Getting Started</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/Statistical-network-analysis-with-Julia/ERGMUserterms.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/Statistical-network-analysis-with-Julia/ERGMUserterms.jl/blob/main/docs/src/getting_started.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Getting-Started"><a class="docs-heading-anchor" href="#Getting-Started">Getting Started</a><a id="Getting-Started-1"></a><a class="docs-heading-anchor-permalink" href="#Getting-Started" title="Permalink"></a></h1><p>This tutorial walks through creating, validating, and using custom ERGM terms with ERGMUserterms.jl.</p><h2 id="Installation"><a class="docs-heading-anchor" href="#Installation">Installation</a><a id="Installation-1"></a><a class="docs-heading-anchor-permalink" href="#Installation" title="Permalink"></a></h2><p>Install ERGMUserterms.jl from GitHub:</p><pre><code class="language-julia hljs">using Pkg
+Pkg.add(url=&quot;https://github.com/statistical-network-analysis-with-Julia/Networks.jl&quot;)
+Pkg.add(url=&quot;https://github.com/statistical-network-analysis-with-Julia/ERGM.jl&quot;)
+Pkg.add(url=&quot;https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl&quot;)</code></pre><h2 id="Basic-Workflow"><a class="docs-heading-anchor" href="#Basic-Workflow">Basic Workflow</a><a id="Basic-Workflow-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Workflow" title="Permalink"></a></h2><p>The typical ERGMUserterms.jl workflow consists of four steps:</p><ol><li><strong>Define the term</strong> - Create a struct and implement the interface</li><li><strong>Validate</strong> - Check correctness with automated tools</li><li><strong>Test</strong> - Run comprehensive tests on various networks</li><li><strong>Use in ERGM</strong> - Integrate with ERGM.jl for model estimation</li></ol><h2 id="Step-1:-Define-a-Custom-Term"><a class="docs-heading-anchor" href="#Step-1:-Define-a-Custom-Term">Step 1: Define a Custom Term</a><a id="Step-1:-Define-a-Custom-Term-1"></a><a class="docs-heading-anchor-permalink" href="#Step-1:-Define-a-Custom-Term" title="Permalink"></a></h2><p>Every custom term needs a struct and three methods:</p><pre><code class="language-julia hljs">using ERGM
+using ERGMUserterms
+using Networks
+import ERGM: name, compute, change_stat   # required to extend the term interface
+
+# Define the struct
+struct SharedNeighborTerm &lt;: AbstractUserTerm end
+
+# Method 1: name
+name(::SharedNeighborTerm) = &quot;shared_neighbors&quot;
+
+# Method 2: compute - full network statistic
+function compute(::SharedNeighborTerm, net)
+    total = 0.0
+    for e in edges(net)
+        i, j = src(e), dst(e)
+        # Count common out-neighbors
+        for k in outneighbors(net, i)
+            k != j &amp;&amp; has_edge(net, j, k) &amp;&amp; (total += 1.0)
+        end
+    end
+    return total
+end
+
+# Method 3: change_stat - the ADD-DIRECTION change statistic: the value of
+# the statistic with edge (i,j) present minus with it absent, regardless of
+# the dyad&#39;s current state. Neighborhoods that could contain the dyad&#39;s own
+# edge are masked (k == j skips) so the value is state-independent.
+function change_stat(::SharedNeighborTerm, net, i::Int, j::Int)
+    delta = 0.0
+
+    # 1. The new edge (i,j)&#39;s own shared out-neighbors
+    for k in outneighbors(net, i)
+        k == j &amp;&amp; continue
+        has_edge(net, j, k) &amp;&amp; (delta += 1.0)
+    end
+
+    # 2. Existing edges (i,b) gain shared out-neighbor j when b→j
+    for b in outneighbors(net, i)
+        b == j &amp;&amp; continue
+        has_edge(net, b, j) &amp;&amp; (delta += 1.0)
+    end
+
+    # 3. Existing edges (a,i) gain shared out-neighbor j when a→j
+    for a in inneighbors(net, i)
+        a == j &amp;&amp; continue
+        has_edge(net, a, j) &amp;&amp; (delta += 1.0)
+    end
+
+    return delta
+end</code></pre><h3 id="Term-Struct-Guidelines"><a class="docs-heading-anchor" href="#Term-Struct-Guidelines">Term Struct Guidelines</a><a id="Term-Struct-Guidelines-1"></a><a class="docs-heading-anchor-permalink" href="#Term-Struct-Guidelines" title="Permalink"></a></h3><table><tr><th style="text-align: right">Guideline</th><th style="text-align: right">Description</th></tr><tr><td style="text-align: right">Subtype <code>AbstractUserTerm</code></td><td style="text-align: right">Ensures compatibility with validation tools</td></tr><tr><td style="text-align: right">Store parameters as fields</td><td style="text-align: right">Any configuration the term needs</td></tr><tr><td style="text-align: right">Use type parameters for flexibility</td><td style="text-align: right">e.g., <code>TemplateTerm{T}</code> for generic parameters</td></tr><tr><td style="text-align: right">Keep structs immutable</td><td style="text-align: right">Use <code>struct</code>, not <code>mutable struct</code></td></tr></table><h2 id="Step-2:-Validate-the-Term"><a class="docs-heading-anchor" href="#Step-2:-Validate-the-Term">Step 2: Validate the Term</a><a id="Step-2:-Validate-the-Term-1"></a><a class="docs-heading-anchor-permalink" href="#Step-2:-Validate-the-Term" title="Permalink"></a></h2><p>Use <code>validate_term</code> to check your implementation:</p><pre><code class="language-julia hljs"># Create a test network
+net = network(10; directed=true)
+for (i, j) in [(1,2), (2,3), (1,3), (3,1), (2,1)]
+    add_edge!(net, i, j)
+end
+
+# Run validation
+term = SharedNeighborTerm()
+valid = validate_term(term, net; verbose=true)
+
+# Output:
+# [ Info: ✓ name() returns: shared_neighbors
+# [ Info: ✓ compute() returns: 4.0 (Float64)
+# [ Info: Testing change_stat() with 10 random edges...
+# [ Info: ✓ change_stat() returns valid values
+# [ Info: Running consistency check...
+# [ Info: ✓ change_stat() consistent with compute()</code></pre><h3 id="Validation-Checks"><a class="docs-heading-anchor" href="#Validation-Checks">Validation Checks</a><a id="Validation-Checks-1"></a><a class="docs-heading-anchor-permalink" href="#Validation-Checks" title="Permalink"></a></h3><table><tr><th style="text-align: right">Check</th><th style="text-align: right">Description</th></tr><tr><td style="text-align: right"><code>name()</code></td><td style="text-align: right">Returns a non-empty String</td></tr><tr><td style="text-align: right"><code>compute()</code></td><td style="text-align: right">Returns a Real value without errors</td></tr><tr><td style="text-align: right"><code>change_stat()</code></td><td style="text-align: right">Returns Real values for random edges</td></tr><tr><td style="text-align: right">Consistency</td><td style="text-align: right"><code>change_stat()</code> matches <code>compute()</code> differences</td></tr></table><h2 id="Step-3:-Test-Comprehensively"><a class="docs-heading-anchor" href="#Step-3:-Test-Comprehensively">Step 3: Test Comprehensively</a><a id="Step-3:-Test-Comprehensively-1"></a><a class="docs-heading-anchor-permalink" href="#Step-3:-Test-Comprehensively" title="Permalink"></a></h2><p>Use <code>test_term</code> for thorough testing on random networks:</p><pre><code class="language-julia hljs">test_term(term; n_vertices=20, density=0.1, n_tests=100)
+
+# Output:
+# Testing term: shared_neighbors
+# ==================================================
+# [ Info: ✓ name() returns: shared_neighbors
+# [ Info: ✓ compute() returns: 12.0 (Float64)
+# [ Info: Testing change_stat() with 10 random edges...
+# [ Info: ✓ change_stat() returns valid values
+# [ Info: Running consistency check...
+# [ Info: ✓ change_stat() consistent with compute()
+#
+# Additional tests:
+# ✓ Works on empty network: 0.0
+# ✓ Works on complete network: 720.0
+# ==================================================
+# All tests PASSED</code></pre><h3 id="Test-Parameters"><a class="docs-heading-anchor" href="#Test-Parameters">Test Parameters</a><a id="Test-Parameters-1"></a><a class="docs-heading-anchor-permalink" href="#Test-Parameters" title="Permalink"></a></h3><table><tr><th style="text-align: right">Parameter</th><th style="text-align: right">Description</th><th style="text-align: right">Default</th></tr><tr><td style="text-align: right"><code>n_vertices</code></td><td style="text-align: right">Number of vertices in random test network</td><td style="text-align: right">20</td></tr><tr><td style="text-align: right"><code>density</code></td><td style="text-align: right">Edge density of random test network</td><td style="text-align: right">0.1</td></tr><tr><td style="text-align: right"><code>n_tests</code></td><td style="text-align: right">Number of random edges for consistency</td><td style="text-align: right">100</td></tr></table><h2 id="Step-4:-Use-in-ERGM"><a class="docs-heading-anchor" href="#Step-4:-Use-in-ERGM">Step 4: Use in ERGM</a><a id="Step-4:-Use-in-ERGM-1"></a><a class="docs-heading-anchor-permalink" href="#Step-4:-Use-in-ERGM" title="Permalink"></a></h2><p>Once validated, your term works with ERGM.jl:</p><pre><code class="language-julia hljs">using ERGM
+using Networks
+
+# Create a network
+net = network(50; directed=true)
+# ... add edges ...
+
+# Use your custom term in a model
+terms = [Edges(), Triangle(), SharedNeighborTerm()]
+
+# Compute statistics
+for term in terms
+    println(name(term), &quot;: &quot;, compute(term, net))
+end</code></pre><h2 id="Complete-Example"><a class="docs-heading-anchor" href="#Complete-Example">Complete Example</a><a id="Complete-Example-1"></a><a class="docs-heading-anchor-permalink" href="#Complete-Example" title="Permalink"></a></h2><pre><code class="language-julia hljs">using ERGM
+using ERGMUserterms
+using Networks
+import ERGM: name, compute, change_stat   # required to extend the term interface
+
+# === Define a parameterized term ===
+struct WeightedDensity &lt;: AbstractUserTerm
+    weight::Float64
+end
+
+name(t::WeightedDensity) = &quot;wdensity.$(t.weight)&quot;
+
+function compute(t::WeightedDensity, net)
+    n = nv(net)
+    max_edges = n * (n - 1)
+    return max_edges &gt; 0 ? t.weight * ne(net) / max_edges : 0.0
+end
+
+function change_stat(t::WeightedDensity, net, i::Int, j::Int)
+    # Add-direction: one extra edge adds weight/max_edges
+    n = nv(net)
+    max_edges = n * (n - 1)
+    max_edges == 0 &amp;&amp; return 0.0
+    return t.weight / max_edges
+end
+
+# === Validate ===
+net = network(20; directed=true)
+for _ in 1:38
+    i, j = rand(1:20), rand(1:20)
+    i != j &amp;&amp; add_edge!(net, i, j)
+end
+
+term = WeightedDensity(10.0)
+valid = validate_term(term, net; verbose=true)
+
+# === Run comprehensive tests ===
+test_term(term; n_vertices=30, density=0.15)
+
+# === Benchmark performance ===
+result = benchmark_term(term, net; n_iter=1000)
+println(&quot;compute() mean: &quot;, round(result.compute_mean * 1e6, digits=2), &quot; μs&quot;)
+println(&quot;change_stat() mean: &quot;, round(result.change_stat_mean * 1e6, digits=2), &quot; μs&quot;)
+println(&quot;Speedup: &quot;, round(result.speedup, digits=1), &quot;×&quot;)
+
+# === Use in model ===
+if valid
+    println(&quot;\nTerm ready for ERGM estimation!&quot;)
+    println(&quot;Statistic value: &quot;, compute(term, net))
+end</code></pre><h2 id="Working-with-the-@ergm_term-Macro"><a class="docs-heading-anchor" href="#Working-with-the-@ergm_term-Macro">Working with the @ergm_term Macro</a><a id="Working-with-the-@ergm_term-Macro-1"></a><a class="docs-heading-anchor-permalink" href="#Working-with-the-@ergm_term-Macro" title="Permalink"></a></h2><p>The <code>@ergm_term</code> macro provides a convenient way to define terms with automatic validation:</p><pre><code class="language-julia hljs">@ergm_term MyDegreeVar begin
+    struct MyDegreeVar &lt;: AbstractUserTerm end
+
+    name(::MyDegreeVar) = &quot;degree_variance&quot;
+
+    function compute(::MyDegreeVar, net)
+        n = nv(net)
+        n == 0 &amp;&amp; return 0.0
+        degrees = [length(outneighbors(net, v)) for v in vertices(net)]
+        mean_deg = sum(degrees) / n
+        return sum((d - mean_deg)^2 for d in degrees) / n
+    end
+
+    function change_stat(::MyDegreeVar, net, i::Int, j::Int)
+        # Add-direction by brute force: statistic with edge (i,j) forced
+        # present minus forced absent, then restore the original state.
+        # (Fine for a small demo; real terms should compute the delta
+        # directly in O(degree) — see the efficiency guidelines.)
+        had = has_edge(net, i, j)
+        had &amp;&amp; rem_edge!(net, i, j)
+        without = compute(MyDegreeVar(), net)
+        add_edge!(net, i, j)
+        with = compute(MyDegreeVar(), net)
+        had || rem_edge!(net, i, j)
+        return with - without
+    end
+end</code></pre><h2 id="Best-Practices"><a class="docs-heading-anchor" href="#Best-Practices">Best Practices</a><a id="Best-Practices-1"></a><a class="docs-heading-anchor-permalink" href="#Best-Practices" title="Permalink"></a></h2><ol><li><strong>Start with a template</strong>: Copy an example term and modify it</li><li><strong>Validate early</strong>: Run <code>validate_term</code> after implementing each method</li><li><strong>Test edge cases</strong>: Verify on empty and complete networks</li><li><strong>Optimize change_stat</strong>: It should be O(degree), not O(edges)</li><li><strong>Use descriptive names</strong>: Include parameters in the name string</li><li><strong>Document your terms</strong>: Use <code>term_documentation()</code> for auto-generated docs</li></ol><h2 id="Next-Steps"><a class="docs-heading-anchor" href="#Next-Steps">Next Steps</a><a id="Next-Steps-1"></a><a class="docs-heading-anchor-permalink" href="#Next-Steps" title="Permalink"></a></h2><ul><li>Learn the <a href="../guide/term_interface/">Term Interface</a> in detail</li><li>Study the <a href="../guide/templates/">Templates and Examples</a> provided</li><li>Master <a href="../guide/validation/">Validation and Testing</a> tools</li><li>Profile with <a href="../guide/benchmarking/">Benchmarking</a> utilities</li></ul></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../guide/term_interface/">Term Interface »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Monday 13 July 2026 23:43">Monday 13 July 2026</span>. Using Julia version 1.12.6.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
