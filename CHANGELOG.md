@@ -33,6 +33,33 @@ and the validation harness now enforces it.
 
 ### Added
 
+- **Third-party terms are now first-class** (issue #1). ERGM.jl's term traits
+  are a public, documented protocol (`ERGM.required_vertex_attributes`,
+  `required_edge_attributes`, `requires_directed`, `requires_undirected`,
+  `is_dyad_dependent`, `Networks.supports_missing`), and ERGM's formula
+  validation and materialization act on the *declarations* rather than on its
+  own term types. A custom term that declares its attributes is validated at
+  `ERGMModel` construction exactly like a built-in one, instead of silently
+  passing through and fitting an all-zero design column.
+- **`validate_traits(term, net)`** — new, and run by `validate_term` unless
+  `traits=false`. It exercises every declaration: that the declared
+  vertex/edge attributes are the ones the term actually reads (attributes are
+  perturbed and the statistic watched; reading an *undeclared vertex*
+  attribute fails validation); that a `requires_directed`/`requires_undirected`
+  declaration is enforced by `ERGMModel` on the direction twin of the network;
+  that an `is_dyad_dependent = false` claim survives toggling every other dyad;
+  that a `supports_missing = true` claim survives flipping the face value of a
+  masked dyad; and that `ERGMModel` construction accepts the term.
+- **`examples/MyTermPackage/`** — a package template for shipping third-party
+  terms: Project.toml, module, and test suite for `ReciprocatedHomophily`, a
+  term that declares all four traits, passes `validate_term`, and fits inside
+  an `ERGMModel`. It is `include`d by this package's test suite, so it stays
+  correct.
+- `InteractionTerm` declares its two vertex attributes
+  (`ERGM.required_vertex_attributes`), so a model naming attributes the
+  network lacks now raises `ArgumentError` at construction. `WeightedEdges`
+  deliberately declares no required edge attribute: it defaults the weight of
+  edges that lack it, so it is well defined without the attribute.
 - Re-exports `compute`, `change_stat`, and `name` (imported from ERGM.jl),
   so term authors extend the ERGM generics directly with one `using`.
 - `profile_term(term; sizes, density, n_iter)` is now implemented (the name

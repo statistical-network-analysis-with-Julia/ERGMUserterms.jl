@@ -1,0 +1,28 @@
+name = "MyTermPackage"
+uuid = "b9ccf2d9-1492-4c93-8551-f663a0d8255e"
+authors = ["Your Name <you@example.com>"]
+version = "0.1.0"
+
+[deps]
+ERGM = "d623cd87-b018-4e2a-bf53-b77ebcdc9da2"
+ERGMUserterms = "fb82099d-cb11-4d76-9fd7-dea636fffb01"
+Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
+Networks = "027a387e-e55f-4537-a155-5037e5a23bdb"
+
+# ERGM.jl, ERGMUserterms.jl and Networks.jl are not in the General registry
+# yet, so they are resolved from paths. Adjust these to wherever you keep them
+# (or drop the section once they are registered).
+[sources]
+ERGM = {path = "../../../ERGM.jl"}
+ERGMUserterms = {path = "../.."}
+Networks = {path = "../../../Networks.jl"}
+
+[compat]
+Graphs = "1.9"
+julia = "1.12"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

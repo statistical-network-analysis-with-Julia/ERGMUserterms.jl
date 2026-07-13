@@ -12,6 +12,28 @@ ERGMUserterms.jl provides five complete example terms that serve as templates fo
 | [`DyadCovTerm`](@ref) | Dyadic covariate | Using an external matrix |
 | [`InteractionTerm`](@ref) | Node interactions | Combining multiple vertex attributes |
 
+## Package Template: `examples/MyTermPackage`
+
+The five terms above are *term* templates. For shipping terms in a package of
+your own, the repository also carries a **package template** —
+`examples/MyTermPackage/` — a copyable skeleton (`Project.toml`, module,
+tests) whose term `ReciprocatedHomophily` declares the full set of ERGM.jl
+traits:
+
+<!-- skip-check -->
+```julia
+ERGM.required_vertex_attributes(t::ReciprocatedHomophily) = (t.attr,)
+ERGM.requires_directed(::ReciprocatedHomophily)           = true
+ERGM.is_dyad_dependent(::ReciprocatedHomophily)           = true
+Networks.supports_missing(::ReciprocatedHomophily)        = true
+```
+
+and, on the strength of those declarations, is validated by
+[`validate_term`](@ref) and accepted (or correctly *rejected* — on an
+undirected network, or one lacking the attribute) by `ERGMModel` construction,
+exactly like an ERGM.jl built-in. See
+[Declaring Your Term's Traits](@ref "Declaring Your Term's Traits").
+
 ## ExampleTerm
 
 The simplest possible custom term. Counts edges weighted by vertex ID sum.

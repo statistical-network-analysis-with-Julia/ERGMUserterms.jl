@@ -9,6 +9,10 @@ validate_term
 ```
 
 ```@docs
+validate_traits
+```
+
+```@docs
 test_term
 ```
 

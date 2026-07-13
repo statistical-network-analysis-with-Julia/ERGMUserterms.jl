@@ -196,7 +196,54 @@ function change_stat(::TriangleTerm, net, i::Int, j::Int)
 end
 ```
 
-## Optional Trait: `is_dyad_dependent`
+## Declaring Your Term's Traits
+
+Implementing `name`/`compute`/`change_stat` makes a term *computable*.
+Declaring its **traits** makes it a first-class citizen: ERGM.jl's formula
+validation and materialization act on the trait declarations, not on ERGM's
+own term types, so a term from any package is checked exactly like a built-in
+one at `ERGMModel` construction.
+
+| trait | default | declare it when |
+|:------|:--------|:----------------|
+| `ERGM.required_vertex_attributes(t)` | `()` | the term reads a vertex attribute and is meaningless without it |
+| `ERGM.required_edge_attributes(t)` | `()` | likewise for an edge attribute |
+| `ERGM.requires_directed(t)` | `false` | the statistic is undefined on undirected networks |
+| `ERGM.requires_undirected(t)` | `false` | ... or on directed ones |
+| `ERGM.is_dyad_dependent(t)` | `true` | the change statistic never reads another dyad → declare `false` |
+| `Networks.supports_missing(t)` | `false` | the statistic consults `is_missing_dyad` and ignores masked dyads |
+
+<!-- skip-check -->
+```julia
+struct Homophily <: AbstractUserTerm
+    attr::Symbol
+end
+
+ERGM.required_vertex_attributes(t::Homophily) = (t.attr,)
+ERGM.is_dyad_dependent(::Homophily) = false
+```
+
+With that declaration, `ERGMModel(ERGMFormula([Edges(), Homophily(:groop)]), net)`
+throws an `ArgumentError` naming the misspelled attribute. Without it, the term
+would read an empty attribute Dict, evaluate to a constant zero, and produce a
+meaningless coefficient — silently.
+
+!!! warning "Declare an attribute only if its absence is an error"
+    "Required" means *the model cannot be fitted without it*. A term that reads
+    an attribute **if present** and falls back to a default — like
+    [`WeightedEdges`](@ref), whose edges without a `:weight` count at
+    `t.default` — genuinely does not require it, and declaring it would reject
+    networks the term handles perfectly well.
+
+[`validate_term`](@ref) exercises every declaration (see
+[`validate_traits`](@ref)): it perturbs the network's attributes to check that
+the ones you declared are the ones your term actually reads, checks that a
+direction requirement is enforced by `ERGMModel`, toggles other dyads to check
+a dyad-independence claim, and flips the face value of masked dyads to check a
+`supports_missing` claim. The package template in
+`examples/MyTermPackage/` is a complete term declaring all four.
+
+### `is_dyad_dependent` in detail
 
 ERGM.jl classifies every term as dyad-dependent or dyad-independent with
 `ERGM.is_dyad_dependent(term)`. The classification matters in two places:
@@ -224,24 +271,22 @@ ERGM.is_dyad_dependent(::MyCovariateTerm) = false
     — keep `AbstractUserTerm` (fallback `true`) or add an explicit
     `is_dyad_dependent` method returning `true`.
 
-## Attribute Validation Happens Only for Built-in Terms
+## Attribute Validation and Snapshotting
 
-`ERGMModel` construction validates ERGM.jl's *own* attribute-based terms
-(`NodeCov`, `NodeMatch`, ...) against the network — a missing vertex
-attribute throws an `ArgumentError` before any fitting — and snapshots
-their attributes into typed vectors. User-defined terms pass through this
-machinery **unchanged**: they are neither validated nor snapshotted. That
-means:
+`ERGMModel` construction validates every term — built-in or not — against the
+network, using the attributes the term **declares** (see
+[Declaring Your Term's Traits](@ref "Declaring Your Term's Traits") above): a
+declared vertex or edge attribute that the network does not have throws an
+`ArgumentError` before any fitting. A term that declares nothing is not
+validated, so an undeclared attribute-based term will read an empty Dict and
+evaluate to zero — declare your attributes.
 
-- A user term reading a misspelled attribute will *not* be caught at model
-  construction; decide explicitly how your `compute`/`change_stat` treat a
-  missing attribute (error loudly, or document a default) and cover it with
-  [`validate_term`](@ref)/[`change_stat_check`](@ref).
-- For hot loops, do the typed-snapshot optimization yourself: read
-  attributes once into a typed container in your term's constructor (or use
-  Network.jl's typed accessors `vertex_attribute_vector(net, attr, V)` /
-  `get_edge_attribute(net, attr, V)`) instead of hitting the untyped
-  attribute Dicts in every `change_stat` call.
+Typed *snapshotting* (materialization into dense `Vector{Float64}`/code
+vectors) is still done only for ERGM.jl's own nodal terms. For hot loops, do
+that optimization yourself: read attributes once into a typed container in your
+term's constructor (or use Networks.jl's typed accessors
+`vertex_attribute_vector(net, attr, V)` / `get_edge_attribute(net, attr, V)`)
+instead of hitting the untyped attribute Dicts in every `change_stat` call.
 
 ## Type Hierarchy
 

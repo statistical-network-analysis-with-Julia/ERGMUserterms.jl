@@ -8,7 +8,7 @@ Install ERGMUserterms.jl from GitHub:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/Network.jl")
+Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/Networks.jl")
 Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/ERGM.jl")
 Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl")
 ```
@@ -29,7 +29,7 @@ Every custom term needs a struct and three methods:
 ```julia
 using ERGM
 using ERGMUserterms
-using Network
+using Networks
 import ERGM: name, compute, change_stat   # required to extend the term interface
 
 # Define the struct
@@ -160,7 +160,7 @@ Once validated, your term works with ERGM.jl:
 
 ```julia
 using ERGM
-using Network
+using Networks
 
 # Create a network
 net = network(50; directed=true)
@@ -180,7 +180,7 @@ end
 ```julia
 using ERGM
 using ERGMUserterms
-using Network
+using Networks
 import ERGM: name, compute, change_stat   # required to extend the term interface
 
 # === Define a parameterized term ===

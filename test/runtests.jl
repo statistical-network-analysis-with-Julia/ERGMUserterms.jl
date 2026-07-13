@@ -1,6 +1,6 @@
 using ERGMUserterms
 using ERGM
-using Network
+using Networks
 using Graphs
 using Random
 using Test
@@ -65,6 +65,82 @@ compute(::CompleteTerm, net) = Float64(ne(net))
 change_stat(::CompleteTerm, net, i::Int, j::Int) = 1.0
 
 struct IncompleteTerm <: AbstractUserTerm end
+
+# ---------------------------------------------------------------------------
+# Terms exercising the public term-trait protocol (ERGM.jl src/terms/traits.jl)
+# ---------------------------------------------------------------------------
+
+# Declares every trait truthfully: reads a vertex attribute, is defined only on
+# directed networks, is dyad-independent, and honours the missing-dyad mask
+# (its statistic never reads a masked dyad's face value).
+struct HonestTerm <: AbstractUserTerm
+    attr::Symbol
+end
+name(t::HonestTerm) = "honest.$(t.attr)"
+function compute(t::HonestTerm, net)
+    vals = get_vertex_attribute(net, t.attr)
+    total = 0.0
+    for e in edges(net)
+        i, j = Int(src(e)), Int(dst(e))
+        is_missing_dyad(net, i, j) && continue
+        total += Float64(get(vals, i, 0.0)) + Float64(get(vals, j, 0.0))
+    end
+    return total
+end
+function change_stat(t::HonestTerm, net, i::Int, j::Int)
+    is_missing_dyad(net, i, j) && return 0.0
+    vals = get_vertex_attribute(net, t.attr)
+    return Float64(get(vals, i, 0.0)) + Float64(get(vals, j, 0.0))
+end
+ERGM.required_vertex_attributes(t::HonestTerm) = (t.attr,)
+ERGM.requires_directed(::HonestTerm) = true
+ERGM.is_dyad_dependent(::HonestTerm) = false
+Networks.supports_missing(::HonestTerm) = true
+
+# Reads a vertex attribute but declares nothing: on a network without :a its
+# statistic silently collapses to zero. validate_traits must catch this.
+struct UndeclaredAttrTerm <: AbstractUserTerm end
+name(::UndeclaredAttrTerm) = "undeclared_attr"
+function compute(::UndeclaredAttrTerm, net)
+    vals = get_vertex_attribute(net, :a)
+    total = 0.0
+    for e in edges(net)
+        total += Float64(get(vals, Int(src(e)), 0.0))
+    end
+    return total
+end
+change_stat(::UndeclaredAttrTerm, net, i::Int, j::Int) =
+    Float64(get(get_vertex_attribute(net, :a), i, 0.0))
+ERGM.is_dyad_dependent(::UndeclaredAttrTerm) = false
+
+# Counts mutual dyads (genuinely dyad-dependent) but claims independence.
+struct LyingDependenceTerm <: AbstractUserTerm end
+name(::LyingDependenceTerm) = "lying_dependence"
+function compute(::LyingDependenceTerm, net)
+    total = 0.0
+    for e in edges(net)
+        i, j = Int(src(e)), Int(dst(e))
+        i < j && has_edge(net, j, i) && (total += 1.0)
+    end
+    return total
+end
+change_stat(::LyingDependenceTerm, net, i::Int, j::Int) =
+    has_edge(net, j, i) ? 1.0 : 0.0
+ERGM.is_dyad_dependent(::LyingDependenceTerm) = false   # false: it is not
+
+# Counts every edge at face value — including masked ones — but claims to
+# honour the mask.
+struct LyingMissingTerm <: AbstractUserTerm end
+name(::LyingMissingTerm) = "lying_missing"
+compute(::LyingMissingTerm, net) = Float64(ne(net))
+change_stat(::LyingMissingTerm, net, i::Int, j::Int) = 1.0
+ERGM.is_dyad_dependent(::LyingMissingTerm) = false
+Networks.supports_missing(::LyingMissingTerm) = true    # true: it is not
+
+# The package template shipped in examples/ — included so it is machine-verified
+include(joinpath(@__DIR__, "..", "examples", "MyTermPackage", "src",
+                 "MyTermPackage.jl"))
+using .MyTermPackage: ReciprocatedHomophily
 
 @testset "ERGMUserterms.jl" begin
     @testset "AbstractUserTerm hierarchy" begin
@@ -169,13 +245,127 @@ struct IncompleteTerm <: AbstractUserTerm end
         @test !ERGM.is_dyad_dependent(WeightedEdges())
         @test ERGM.is_dyad_dependent(SharedNeighborTerm())
 
-        # ERGM's model-construction validation and attribute materialization
-        # cover only its built-in attribute terms: a user term referencing a
-        # nonexistent attribute passes through unchanged (and unvalidated)
-        model = ERGMModel(ERGMFormula([Edges(), InteractionTerm(:no_such_a,
-                                                                :no_such_b)]),
-                          net)
-        @test model.formula.terms[2] isa InteractionTerm
+        # A user term that declares its attributes (InteractionTerm does, via
+        # ERGM.required_vertex_attributes) is validated at model construction
+        # exactly like a built-in one
+        @test_throws ArgumentError ERGMModel(
+            ERGMFormula([Edges(), InteractionTerm(:no_such_a, :no_such_b)]), net)
+
+        # A term declaring no attributes still passes through unchanged
+        model = ERGMModel(ERGMFormula([Edges(), ExampleTerm()]), net)
+        @test model.formula.terms[2] isa ExampleTerm
+    end
+
+    @testset "Public term-trait protocol" begin
+        Random.seed!(23)
+        net = random_net(10, 22; directed=true, seed=9)
+        set_vertex_attribute!(net, :a, Dict(v => Float64(v) for v in 1:10))
+
+        # Declarations reach ERGM.jl's public trait functions
+        term = HonestTerm(:a)
+        @test ERGM.required_vertex_attributes(term) == (:a,)
+        @test ERGM.required_edge_attributes(term) == ()
+        @test ERGM.requires_directed(term)
+        @test !ERGM.requires_undirected(term)
+        @test !ERGM.is_dyad_dependent(term)
+        @test supports_missing(term)
+
+        # Defaults for a term that declares nothing
+        @test ERGM.required_vertex_attributes(ExampleTerm()) == ()
+        @test ERGM.required_edge_attributes(ExampleTerm()) == ()
+        @test !ERGM.requires_directed(ExampleTerm())
+        @test !supports_missing(ExampleTerm())
+
+        # A term declaring all four traits is accepted by ERGMModel and fits
+        model = ERGMModel(ERGMFormula([Edges(), term]), net)
+        @test model.formula.terms.names == ["edges", "honest.a"]
+        @test length(coef(fit_ergm(net, [Edges(), term]))) == 2
+
+        # A declared direction requirement is enforced: rejected undirected
+        und = network(10; directed=false)
+        set_vertex_attribute!(und, :a, Dict(v => Float64(v) for v in 1:10))
+        add_edge!(und, 1, 2)
+        @test_throws ArgumentError ERGMModel(ERGMFormula([Edges(), term]), und)
+
+        # A declared vertex attribute the network lacks: the standard error
+        @test_throws ArgumentError ERGMModel(
+            ERGMFormula([Edges(), HonestTerm(:no_such)]), net)
+        err = try
+            ERGMModel(ERGMFormula([HonestTerm(:no_such)]), net)
+        catch e
+            e
+        end
+        @test occursin("vertex attribute :no_such", err.msg)
+
+        # Backward compatibility: the private names TERGM.jl declares methods
+        # on still work, and dispatch on the same generic as the public ones
+        @test ERGM._requires_directed === ERGM.requires_directed
+        @test ERGM._requires_directed(term)
+        @test ERGM._vertex_attribute(term) == :a
+        @test ERGM._vertex_attribute(ExampleTerm()) === nothing
+    end
+
+    @testset "validate_traits exercises the declarations" begin
+        Random.seed!(29)
+        net = random_net(10, 24; directed=true, seed=13)
+        set_vertex_attribute!(net, :a, Dict(v => Float64(v) for v in 1:10))
+        set_vertex_attribute!(net, :b, Dict(v => Float64(11 - v) for v in 1:10))
+
+        # Truthful declarations pass (interface + traits)
+        @test validate_traits(HonestTerm(:a), net; verbose=false)
+        @test validate_term(HonestTerm(:a), net; verbose=false)
+
+        # Reads :a but declares nothing -> caught
+        @test !validate_traits(UndeclaredAttrTerm(), net; verbose=false)
+        @test !validate_term(UndeclaredAttrTerm(), net; verbose=false)
+
+        # Claims dyad-independence but reads the reverse arc -> caught
+        @test !validate_traits(LyingDependenceTerm(), net; verbose=false)
+
+        # Claims to honour the mask but counts masked edges at face value
+        @test !validate_traits(LyingMissingTerm(), net; verbose=false)
+
+        # A directed-only term validated on an undirected network is a
+        # mismatch the harness reports rather than silently accepting
+        und = random_net(10, 20; directed=false, seed=17)
+        set_vertex_attribute!(und, :a, Dict(v => Float64(v) for v in 1:10))
+        @test !validate_traits(HonestTerm(:a), und; verbose=false)
+
+        # Terms declaring nothing keep validating as before
+        @test validate_traits(ExampleTerm(), net; verbose=false)
+        @test validate_term(TemplateTerm(1.5), net; verbose=false)
+
+        # Trait checks can be switched off
+        @test validate_term(UndeclaredAttrTerm(), net; verbose=false, traits=false)
+    end
+
+    @testset "Package template (examples/MyTermPackage)" begin
+        net = network(8; directed=true)
+        set_vertex_attribute!(net, :group,
+                              Dict(v => isodd(v) ? "a" : "b" for v in 1:8))
+        for (i, j) in ((1, 3), (3, 1), (2, 4), (4, 2), (1, 2), (5, 7), (6, 8))
+            add_edge!(net, i, j)
+        end
+        term = ReciprocatedHomophily(:group)
+
+        # Statistic and the four declarations
+        @test compute(term, net) == 2.0
+        @test ERGM.required_vertex_attributes(term) == (:group,)
+        @test ERGM.requires_directed(term)
+        @test ERGM.is_dyad_dependent(term)
+        @test supports_missing(term)
+
+        # The template passes the full harness and ERGM model construction
+        Random.seed!(31)
+        @test validate_term(term, net; verbose=false)
+        @test consistency_check(term, net; exhaustive=true)
+        model = ERGMModel(ERGMFormula([Edges(), term]), net)
+        @test model.formula.terms.names == ["edges", "recip_homophily.group"]
+
+        # Masked dyads do not enter the statistic (supports_missing = true)
+        masked = deepcopy(net)
+        set_missing_dyad!(masked, 1, 3)
+        @test compute(term, masked) == 1.0
     end
 
     @testset "@ergm_term definition checks" begin

@@ -57,7 +57,7 @@ ERGMUserterms.jl is designed for:
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/Network.jl")
+Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/Networks.jl")
 Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/ERGM.jl")
 Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl")
 ```
@@ -74,7 +74,7 @@ Pkg.develop(path="/path/to/ERGMUserterms.jl")
 ```julia
 using ERGM
 using ERGMUserterms
-using Network
+using Networks
 
 # Define a custom term
 struct MyTerm <: AbstractUserTerm

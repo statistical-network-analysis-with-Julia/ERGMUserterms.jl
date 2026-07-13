@@ -23,11 +23,11 @@ This package is a Julia port of the R `ergm.userterms` package from the StatNet 
 ## Installation
 
 Requires Julia 1.12+. ERGMUserterms.jl depends on the unregistered
-[Network.jl](https://github.com/statistical-network-analysis-with-Julia/Network.jl) and [ERGM.jl](https://github.com/statistical-network-analysis-with-Julia/ERGM.jl) packages, which must be added first (in this order):
+[Networks.jl](https://github.com/statistical-network-analysis-with-Julia/Networks.jl) and [ERGM.jl](https://github.com/statistical-network-analysis-with-Julia/ERGM.jl) packages, which must be added first (in this order):
 
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/Network.jl")
+Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/Networks.jl")
 Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/ERGM.jl")
 Pkg.add(url="https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl")
 ```
@@ -50,7 +50,7 @@ then wire the packages together with no ordered installs needed.
 ```julia
 using ERGM
 using ERGMUserterms
-using Network
+using Networks
 
 # Extend the interface generics (required so ERGM.jl sees your methods)
 import ERGMUserterms: name, compute, change_stat
@@ -102,12 +102,32 @@ edge currently exists — the toggle-direction idiom
 harness (ERGM.jl's MH sampler negates the add-direction value itself for
 removal proposals).
 
-Optionally, covariate-only terms (change statistic never reads other dyads)
-should declare `ERGM.is_dyad_dependent(::MyTerm) = false` — the fallback for
-unknown terms is `true`, which triggers ERGM.jl's pseudo-likelihood caveat
-and a conservative MCMLE bridge reference. Note that ERGM.jl validates only
-its *built-in* attribute terms at model construction; user terms must handle
-missing attributes themselves.
+A term also **declares its traits** through ERGM.jl's public term-trait
+protocol. ERGM's formula validation reads the declarations, not the term's
+type, so a custom term is validated at model construction exactly like a
+built-in one:
+
+<!-- skip-check -->
+```julia
+ERGM.required_vertex_attributes(t::MyTerm) = (t.attr,)  # default ()
+ERGM.required_edge_attributes(t::MyTerm)   = ()         # default ()
+ERGM.requires_directed(::MyTerm)           = true       # default false
+ERGM.requires_undirected(::MyTerm)         = false      # default false
+ERGM.is_dyad_dependent(::MyTerm)           = false      # default true (conservative)
+Networks.supports_missing(::MyTerm)        = true       # default false
+```
+
+Declare an attribute iff its absence is an *error*: a term reading an
+undeclared attribute silently becomes an all-zero design column on a network
+that lacks it, whereas a declared one raises an `ArgumentError` naming it.
+Declare `is_dyad_dependent = false` only for covariate-only terms — the
+fallback `true` triggers ERGM.jl's pseudo-likelihood caveat and a conservative
+MCMLE bridge reference. Declare `supports_missing = true` only if the statistic
+consults `is_missing_dyad` and so ignores masked dyads' face values.
+
+`validate_term` exercises all of it, and
+[`examples/MyTermPackage/`](examples/MyTermPackage) is a copyable package
+template for a third-party term declaring the lot.
 
 ## Validation
 
