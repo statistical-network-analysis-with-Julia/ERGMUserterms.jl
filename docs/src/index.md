@@ -156,3 +156,18 @@ with $\mathbf{y}^{+}_{ij}$/$\mathbf{y}^{-}_{ij}$ the network with the edge force
 3. Hunter, D.R. (2007). Curved exponential family models for social networks. *Social Networks*, 29(2), 216-230.
 
 4. Robins, G., Pattison, P., Kalish, Y., Lusher, D. (2007). An introduction to exponential random graph (p*) models for social networks. *Social Networks*, 29(2), 173-191.
+
+## Citation
+
+If you use ERGMUserterms.jl in your work, please cite it using the entry in
+[`CITATION.bib`](https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl/blob/main/CITATION.bib):
+
+```biblatex
+@misc{SNWJERGMUsertermsJL,
+  author = {{Statistical Network Analysis with Julia}},
+  title = {ERGMUserterms.jl: Custom ERGM Term Development for Julia},
+  year = {2026},
+  url = {https://github.com/statistical-network-analysis-with-Julia/ERGMUserterms.jl},
+  note = {Homepage: https://statistical-network-analysis-with-Julia.github.io/ERGMUserterms.jl; GitHub: https://github.com/statistical-network-analysis-with-Julia}
+}
+```
