@@ -1,0 +1,78 @@
+name = "userterms_examples"
+
+[provenance]
+r_version = "4.6.1"
+ergm_version = "4.12.0"
+network_version = "1.20.0"
+seed = 20260912
+script = "test/fixtures/r/userterms_examples.R"
+date = "2026-09-12"
+datasets = "8-vertex directed network from a literal edge list (examples/MyTermPackage test network: (1,3),(3,1),(2,4),(4,2),(1,2),(5,7),(6,8) plus (2,5),(5,2),(3,6),(8,1)); vertex attributes id = 1:8, a = 1:8, b = 9 - (1:8), group = a,b alternating; W = 2.5 on the arcs (1,3),(2,4),(1,2),(5,7),(2,5) and 1.0 elsewhere; cov[i,j] = 2i + j; M[i,j] = a_i*b_j + a_j*b_i; and its undirected projection (one edge per unordered pair, W and cov symmetrised to their (min,max) entry)"
+model_directed = "net ~ nodecov(\"id\") + edges + edgecov(W) + edgecov(cov) + edgecov(M) + mutual(same=\"group\", diff=FALSE) -- summary() and ergmMPLE(output=\"array\")$predictor; no estimation"
+model_undirected = "und ~ nodecov(\"id\") + edges + edgecov(Wu) + edgecov(covu) + edgecov(M) -- summary() and ergmMPLE(output=\"array\")$predictor; no estimation"
+term_map = "ExampleTerm() = nodecov(id); TemplateTerm(1.0) = edges; WeightedEdges() = edgecov(W); DyadCovTerm(cov) = edgecov(cov); InteractionTerm(:a, :b) = edgecov(M); ReciprocatedHomophily(:group) = mutual(same=group, diff=FALSE)"
+
+[tolerance]
+# Every value is a DETERMINISTIC function of a fixed graph and fixed
+# integer/rational covariates (integers, halves and their sums): no
+# estimator, no Monte Carlo, no optimizer. R's C code and the Julia terms
+# must agree to machine precision; 1e-9 is a formality. Any disagreement
+# is a bug in a term formula, in a canonical (min,max) key, or in the
+# harness's brute-force reference -- do not loosen.
+summary_directed = 1e-9
+summary_undirected = 1e-9
+change_example_directed = 1e-9
+change_template_directed = 1e-9
+change_weightededges_directed = 1e-9
+change_dyadcov_directed = 1e-9
+change_interaction_directed = 1e-9
+change_recip_homophily_directed = 1e-9
+change_example_undirected = 1e-9
+change_template_undirected = 1e-9
+change_weightededges_undirected = 1e-9
+change_dyadcov_undirected = 1e-9
+change_interaction_undirected = 1e-9
+
+[values]
+# --- the network (tail -> head, 1-based), so the Julia test rebuilds it
+# from the TOML alone; the (weighted_tails, weighted_heads) arcs carry
+# `weight`, every other arc has no stored weight ----------------------------
+n = 8
+tails = [1, 3, 2, 4, 1, 5, 6, 2, 5, 3, 8]
+heads = [3, 1, 4, 2, 2, 7, 8, 5, 2, 6, 1]
+weighted_tails = [1, 2, 1, 5, 2]
+weighted_heads = [3, 4, 2, 7, 5]
+weight = 2.5
+a = [1, 2, 3, 4, 5, 6, 7, 8]
+b = [8, 7, 6, 5, 4, 3, 2, 1]
+group = ["a", "b", "a", "b", "a", "b", "a", "b"]
+
+# --- (a) directed summary, in the order ExampleTerm, TemplateTerm(1.0),
+# WeightedEdges(), DyadCovTerm(cov), InteractionTerm(:a,:b),
+# ReciprocatedHomophily(:group). `r_names_directed` are R's labels: they
+# are NOT the Julia terms' names and the testset asserts they are not
+# claimed ---------------------------------------------------------------
+r_names_directed = ["nodecov.id", "edges", "edgecov.W", "edgecov.cov", "edgecov.M", "mutual.group"]
+summary_directed = [81, 11, 18.5, 121, 423, 2]
+
+# --- (b) directed add-direction change statistics from ergmMPLE's array,
+# one vector per term, ROW-MAJOR over ordered dyads: for i in 1:8, for j
+# in 1:8, j != i (56 values) -----------------------------------------------
+change_example_directed = [3, 4, 5, 6, 7, 8, 9, 3, 5, 6, 7, 8, 9, 10, 4, 5, 7, 8, 9, 10, 11, 5, 6, 7, 9, 10, 11, 12, 6, 7, 8, 9, 11, 12, 13, 7, 8, 9, 10, 11, 13, 14, 8, 9, 10, 11, 12, 13, 15, 9, 10, 11, 12, 13, 14, 15]
+change_template_directed = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+change_weightededges_directed = [2.5, 2.5, 1, 1, 1, 1, 1, 1, 1, 2.5, 2.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+change_dyadcov_directed = [4, 5, 6, 7, 8, 9, 10, 5, 7, 8, 9, 10, 11, 12, 7, 8, 10, 11, 12, 13, 14, 9, 10, 11, 13, 14, 15, 16, 11, 12, 13, 14, 16, 17, 18, 13, 14, 15, 16, 17, 19, 20, 15, 16, 17, 18, 19, 20, 22, 17, 18, 19, 20, 21, 22, 23]
+change_interaction_directed = [23, 30, 37, 44, 51, 58, 65, 23, 33, 38, 43, 48, 53, 58, 30, 33, 39, 42, 45, 48, 51, 37, 38, 39, 41, 42, 43, 44, 44, 43, 42, 41, 39, 38, 37, 51, 48, 45, 42, 39, 33, 30, 58, 53, 48, 43, 38, 33, 23, 65, 58, 51, 44, 37, 30, 23]
+change_recip_homophily_directed = [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+
+# --- (c) undirected projection: edge list (i < j), summary, and change
+# statistics ROW-MAJOR over unordered dyads i < j (28 values) --------------
+und_tails = [1, 2, 1, 5, 6, 2, 3, 1]
+und_heads = [3, 4, 2, 7, 8, 5, 6, 8]
+r_names_undirected = ["nodecov.id", "edges", "edgecov.Wu", "edgecov.covu", "edgecov.M"]
+summary_undirected = [64, 8, 15.5, 85, 312]
+change_example_undirected = [3, 4, 5, 6, 7, 8, 9, 5, 6, 7, 8, 9, 10, 7, 8, 9, 10, 11, 9, 10, 11, 12, 11, 12, 13, 13, 14, 15]
+change_template_undirected = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+change_weightededges_undirected = [2.5, 2.5, 1, 1, 1, 1, 1, 1, 2.5, 2.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2.5, 1, 1, 1, 1]
+change_dyadcov_undirected = [4, 5, 6, 7, 8, 9, 10, 7, 8, 9, 10, 11, 12, 10, 11, 12, 13, 14, 13, 14, 15, 16, 16, 17, 18, 19, 20, 22]
+change_interaction_undirected = [23, 30, 37, 44, 51, 58, 65, 33, 38, 43, 48, 53, 58, 39, 42, 45, 48, 51, 41, 42, 43, 44, 39, 38, 37, 33, 30, 23]

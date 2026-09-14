@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Filters for Depth/Shadow -->
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+      <feOffset dx="2" dy="2" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode in="offsetblur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Gradients for Julia Colors -->
+    <!-- Purple -->
+    <radialGradient id="grad-purple" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#b57fe3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9558B2;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Red -->
+    <radialGradient id="grad-red" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#e65c53;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#CB3C33;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Green -->
+    <radialGradient id="grad-green" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#5cb84b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#389826;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Gear tooth marker -->
+    <marker id="gear-tooth" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+      <rect x="1" y="1" width="6" height="6" fill="#4063D8" rx="1"/>
+    </marker>
+  </defs>
+
+  <!-- Background Container (White rounded rect) -->
+  <rect x="24" y="24" width="464" height="464" rx="80" fill="#ffffff" stroke="#e0e0e0" stroke-width="2"/>
+
+  <!-- Main Content Group: Gear + Nodes -->
+
+  <!-- Gear shape (representing customization/tooling) -->
+  <g transform="translate(256, 210) scale(0.65)">
+    <!-- Outer gear ring -->
+    <path d="M0,-130 L20,-125 25,-100 50,-95 55,-120 75,-110 65,-85 85,-70 100,-85 110,-65 90,-55 95,-30 115,-20 120,0 100,5 95,30 115,40 110,60 90,50 80,70 95,85 75,95 60,80 40,90 35,110 15,105 10,85 -10,85 -15,105 -35,110 -40,90 -60,80 -75,95 -95,85 -80,70 -90,50 -110,60 -115,40 -95,30 -100,5 -120,0 -115,-20 -95,-30 -90,-55 -110,-65 -100,-85 -85,-70 -65,-85 -75,-110 -55,-120 -50,-95 -25,-100 -20,-125 Z" fill="#4063D8" opacity="0.15" stroke="#4063D8" stroke-width="2"/>
+
+    <!-- Inner circle -->
+    <circle cx="0" cy="0" r="65" fill="#ffffff" stroke="#4063D8" stroke-width="3"/>
+
+    <!-- Plus sign (representing "user terms" / custom) -->
+    <rect x="-25" y="-5" width="50" height="10" fill="#4063D8" rx="3"/>
+    <rect x="-5" y="-25" width="10" height="50" fill="#4063D8" rx="3"/>
+  </g>
+
+  <!-- Three nodes around the gear -->
+  <g transform="translate(0, -20) scale(0.8)">
+    <!-- Top node: Purple -->
+    <circle cx="256" cy="90" r="35" fill="url(#grad-purple)" stroke="#ffffff" stroke-width="3" filter="url(#dropShadow)"/>
+
+    <!-- Bottom-Left node: Green -->
+    <circle cx="130" cy="340" r="35" fill="url(#grad-green)" stroke="#ffffff" stroke-width="3" filter="url(#dropShadow)"/>
+
+    <!-- Bottom-Right node: Red -->
+    <circle cx="382" cy="340" r="35" fill="url(#grad-red)" stroke="#ffffff" stroke-width="3" filter="url(#dropShadow)"/>
+
+    <!-- Connecting lines (dashed = customizable) -->
+    <line x1="245" y1="122" x2="150" y2="310" stroke="#4063D8" stroke-width="3" stroke-dasharray="8,4" opacity="0.5"/>
+    <line x1="267" y1="122" x2="362" y2="310" stroke="#4063D8" stroke-width="3" stroke-dasharray="8,4" opacity="0.5"/>
+    <line x1="165" y1="340" x2="347" y2="340" stroke="#4063D8" stroke-width="3" stroke-dasharray="8,4" opacity="0.5"/>
+  </g>
+
+  <!-- Text -->
+  <g transform="translate(256, 455)" text-anchor="middle" font-family="sans-serif" font-weight="900" letter-spacing="1">
+    <!-- ERGMUserterms -->
+    <text x="-130" y="0" fill="#9558B2" font-size="38" filter="url(#dropShadow)">ERGM</text>
+    <text x="20" y="0" fill="#CB3C33" font-size="38" filter="url(#dropShadow)">User</text>
+    <text x="115" y="0" fill="#389826" font-size="38" filter="url(#dropShadow)">terms</text>
+    <!-- .jl -->
+    <text x="175" y="0" fill="#555555" font-size="38">.jl</text>
+  </g>
+
+</svg>
