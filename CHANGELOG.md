@@ -274,6 +274,8 @@ and the validation harness now enforces it.
 
 ### Changed
 
+- Documentation uses the default Documenter themes, with a new package-specific
+  SVG icon and browser favicon in the official Julia logo colors.
 - Bundled example terms read attributes per element
   (`get_edge_attribute(net, attr, i, j)` / `get_vertex_attribute(net, attr,
   v)`, which canonicalise the undirected `(min, max)` key) with a default for
