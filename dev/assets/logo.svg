@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">ERGMUserterms.jl</title>
+  <desc id="desc">A network statistic inside code brackets: writing and validating custom ERGM terms.</desc>
+  <path d="M62 57 25 128 62 199M194 57 231 128 194 199" fill="none" stroke="#4063D8" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M94 161 128 94 162 161Z" fill="none" stroke="#9558B2" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="128" cy="94" r="18" fill="#389826"/>
+  <circle cx="94" cy="161" r="18" fill="#CB3C33"/>
+  <circle cx="162" cy="161" r="18" fill="#9558B2"/>
+</svg>
